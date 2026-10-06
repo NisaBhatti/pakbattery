@@ -16,4 +16,8 @@ class Product extends Model
         'price',
         'stock',
     ];
+    public function purchaseItems()
+{
+    return $this->hasMany(PurchaseItem::class);
+}
 }
