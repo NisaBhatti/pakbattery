@@ -4,7 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\PurchaseController; // We will create this next
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\BillController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +29,14 @@ Route::resource('products', ProductController::class);
 Route::get('suppliers/{supplier}/delete', [SupplierController::class, 'confirmDelete'])->name('suppliers.delete');
 Route::resource('suppliers', SupplierController::class);
 
-// Purchases (Invoices)
+// Purchases
 Route::get('purchases/{purchase}/delete', [PurchaseController::class, 'confirmDelete'])->name('purchases.delete');
 Route::resource('purchases', PurchaseController::class);
+
+// Customers
+Route::get('customers/{customer}/delete', [CustomerController::class, 'confirmDelete'])->name('customers.delete');
+Route::resource('customers', CustomerController::class);
+
+// Bills (Sales)
+Route::get('bills/{bill}/delete', [BillController::class, 'confirmDelete'])->name('bills.delete');
+Route::resource('bills', BillController::class);

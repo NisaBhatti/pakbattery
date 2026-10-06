@@ -6,20 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('bills', function (Blueprint $table) {
             $table->id();
+            $table->string('bill_number')->unique();
+            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
+            $table->date('bill_date');
+            $table->decimal('total_amount', 12, 2)->default(0);
+            $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('bills');
