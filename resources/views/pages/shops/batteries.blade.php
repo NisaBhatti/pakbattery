@@ -14,6 +14,43 @@
         </div>
     </div>
 
+    <!-- Hero Summary Banner — NEW -->
+    <div class="hero-summary-card fade-in-up mb-4">
+        <div class="hero-summary-border"></div>
+        <div class="hero-summary-shape hero-shape-1"></div>
+        <div class="hero-summary-shape hero-shape-2"></div>
+        <div class="hero-summary-shape hero-shape-3"></div>
+        
+        <div class="hero-summary-content">
+            <div class="hero-summary-left">
+                <div class="hero-summary-icon">
+                    <i class="ph ph-battery-charging"></i>
+                </div>
+                <div class="hero-summary-text">
+                    <span class="hero-summary-badge">
+                        <i class="ph ph-sparkle"></i>
+                        Live Inventory Overview
+                    </span>
+                    <h2 class="hero-summary-title">Battery Stock Summary</h2>
+                    <p class="hero-summary-subtitle">
+                        Real-time inventory across all your shop locations
+                    </p>
+                </div>
+            </div>
+            <div class="hero-summary-stats">
+                <div class="hero-summary-stat">
+                    <span class="hero-summary-stat-label">UNITS</span>
+                    <span class="hero-summary-stat-value" data-count="{{ $totalBatteries }}">{{ $totalBatteries }}</span>
+                </div>
+                <div class="hero-summary-divider"></div>
+                <div class="hero-summary-stat">
+                    <span class="hero-summary-stat-label">SHOPS</span>
+                    <span class="hero-summary-stat-value" data-count="{{ $totalShops }}">{{ $totalShops }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Stats Cards — Premium -->
     <div class="row g-4 mb-4">
         <!-- Total Batteries -->
@@ -87,7 +124,6 @@
 
     <!-- Filters Card — Premium -->
     <div class="filter-card fade-in-up mb-4">
-        <!-- Animated Top Gradient Border -->
         <div class="filter-card-border"></div>
         
         <div class="card-body p-4 p-md-5 position-relative">
@@ -100,12 +136,22 @@
                     <h6 class="fw-bold mb-0 filter-title">Filters</h6>
                     <p class="text-muted mb-0 filter-subtitle">Refine your battery search results</p>
                 </div>
+                <!-- Active Filter Count Badge -->
+                @php
+                    $activeFilters = collect([request('search'), request('product_id'), request('stock_level')])->filter()->count();
+                @endphp
+                @if($activeFilters > 0)
+                    <span class="active-filter-badge ms-auto">
+                        <i class="ph ph-check-circle"></i>
+                        {{ $activeFilters }} active
+                    </span>
+                @endif
             </div>
 
             <form method="GET" action="{{ route('shops.batteries') }}">
                 <div class="row g-3">
                     <!-- Search -->
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-4 col-md-6">
                         <label class="filter-label">Search</label>
                         <div class="filter-input-wrapper">
                             <span class="filter-input-icon">
@@ -118,24 +164,8 @@
                         </div>
                     </div>
                     
-                    <!-- Shop -->
-                    <div class="col-lg-2 col-md-6">
-                        <label class="filter-label">Shop</label>
-                        <div class="filter-input-wrapper">
-                            <span class="filter-input-icon">
-                                <i class="ph ph-storefront"></i>
-                            </span>
-                            <select name="shop_id" class="filter-select">
-                                <option value="">All Shops</option>
-                                @foreach($shops as $shop)
-                                    <option value="{{ $shop->id }}" {{ request('shop_id') == $shop->id ? 'selected' : '' }}>{{ $shop->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    
                     <!-- Product -->
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-4 col-md-6">
                         <label class="filter-label">Product</label>
                         <div class="filter-input-wrapper">
                             <span class="filter-input-icon">
@@ -143,7 +173,7 @@
                             </span>
                             <select name="product_id" class="filter-select">
                                 <option value="">All Products</option>
-                                @foreach($products as $product)
+                                @foreach($allProducts as $product)
                                     <option value="{{ $product->id }}" {{ request('product_id') == $product->id ? 'selected' : '' }}>{{ $product->name }}</option>
                                 @endforeach
                             </select>
@@ -182,7 +212,6 @@
 
     <!-- Batteries Table Card — Premium -->
     <div class="table-card fade-in-up">
-        <!-- Animated Top Gradient Border -->
         <div class="table-card-border"></div>
         
         <!-- Table Section Header -->
@@ -193,8 +222,17 @@
             <div>
                 <h5 class="fw-bold mb-0 section-title">Battery Stock</h5>
                 <p class="text-muted mb-0 section-subtitle">
-                    {{ $stocks->total() ?? $stocks->count() }} stock {{ ($stocks->total() ?? $stocks->count()) !== 1 ? 'entries' : 'entry' }} found
+                    {{ $products->total() ?? $products->count() }} product{{ ($products->total() ?? $products->count()) !== 1 ? 's' : '' }} found
                 </p>
+            </div>
+            <!-- View Toggle (Visual Only) -->
+            <div class="view-toggle ms-auto">
+                <button type="button" class="view-toggle-btn active" title="Table view">
+                    <i class="ph ph-list-dashes"></i>
+                </button>
+                <button type="button" class="view-toggle-btn" title="Grid view (coming soon)" disabled>
+                    <i class="ph ph-squares-four"></i>
+                </button>
             </div>
         </div>
 
@@ -205,15 +243,13 @@
                         <tr>
                             <th class="ps-4">Product</th>
                             <th>Plate Number</th>
-                            <th>Shop</th>
                             <th class="text-center">Quantity</th>
                             <th class="pe-4 text-end">Value</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($stocks as $stock)
+                        @forelse($products as $product)
                         <tr class="battery-row">
-                            
                             <!-- Product -->
                             <td class="ps-4">
                                 <div class="d-flex align-items-center">
@@ -221,7 +257,7 @@
                                         <i class="ph ph-battery-charging"></i>
                                     </div>
                                     <div class="product-info">
-                                        <span class="product-name">{{ $stock->product->name ?? 'N/A' }}</span>
+                                        <span class="product-name">{{ $product->name }}</span>
                                         <small class="product-meta">Battery Unit</small>
                                     </div>
                                 </div>
@@ -229,40 +265,32 @@
                             
                             <!-- Plate Number -->
                             <td>
-                                @if($stock->product->plate_number ?? null)
+                                @if($product->plate_number)
                                     <span class="plate-badge">
                                         <i class="ph ph-barcode"></i>
-                                        {{ $stock->product->plate_number }}
+                                        {{ $product->plate_number }}
                                     </span>
                                 @else
                                     <span class="text-muted-na">N/A</span>
                                 @endif
                             </td>
                             
-                            <!-- Shop -->
-                            <td>
-                                <span class="shop-badge">
-                                    <i class="ph ph-storefront"></i>
-                                    {{ $stock->shop->name ?? 'N/A' }}
-                                </span>
-                            </td>
-                            
                             <!-- Quantity -->
                             <td class="text-center">
-                                @if($stock->quantity <= 5)
+                                @if($product->stock <= 5)
                                     <span class="qty-badge qty-low">
                                         <span class="qty-dot"></span>
-                                        {{ $stock->quantity }} Low
+                                        {{ $product->stock }} Low
                                     </span>
-                                @elseif($stock->quantity <= 20)
+                                @elseif($product->stock <= 20)
                                     <span class="qty-badge qty-medium">
                                         <span class="qty-dot"></span>
-                                        {{ $stock->quantity }}
+                                        {{ $product->stock }}
                                     </span>
                                 @else
                                     <span class="qty-badge qty-good">
                                         <span class="qty-dot"></span>
-                                        {{ $stock->quantity }}
+                                        {{ $product->stock }}
                                     </span>
                                 @endif
                             </td>
@@ -270,13 +298,13 @@
                             <!-- Value -->
                             <td class="pe-4 text-end">
                                 <span class="value-tag">
-                                    ${{ number_format(($stock->product->price ?? 0) * $stock->quantity, 2) }}
+                                    ${{ number_format($product->price * $product->stock, 2) }}
                                 </span>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="text-center py-5">
+                            <td colspan="4" class="text-center py-5">
                                 <div class="empty-state">
                                     <div class="empty-icon-wrapper">
                                         <i class="ph ph-magnifying-glass"></i>
@@ -292,13 +320,13 @@
             </div>
             
             <!-- Pagination -->
-            @if($stocks->hasPages())
+            @if($products->hasPages())
             <div class="pagination-wrapper">
                 <div class="pagination-info">
-                    Showing {{ $stocks->firstItem() }} to {{ $stocks->lastItem() }} of {{ $stocks->total() }} results
+                    Showing {{ $products->firstItem() }} to {{ $products->lastItem() }} of {{ $products->total() }} results
                 </div>
                 <div class="pagination-links">
-                    {{ $stocks->links() }}
+                    {{ $products->links() }}
                 </div>
             </div>
             @endif
@@ -348,9 +376,7 @@
         transition: width 0.4s ease;
     }
 
-    .page-header:hover .page-title::after {
-        width: 100%;
-    }
+    .page-header:hover .page-title::after { width: 100%; }
 
     .page-subtitle {
         font-size: 0.9rem;
@@ -358,8 +384,208 @@
         align-items: center;
     }
 
-    .page-subtitle i {
-        color: var(--primary-electric);
+    .page-subtitle i { color: var(--primary-electric); }
+
+    /* --- HERO SUMMARY BANNER --- */
+    .hero-summary-card {
+        background: linear-gradient(135deg, var(--violet-core) 0%, var(--violet-deep) 50%, var(--primary-deep) 100%);
+        border-radius: 24px;
+        padding: 32px 40px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 50px -12px rgba(139, 92, 246, 0.4);
+        transition: var(--transition-smooth);
+    }
+
+    .hero-summary-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 25px 60px -12px rgba(139, 92, 246, 0.5);
+    }
+
+    .hero-summary-border {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--accent-mint), var(--primary-electric), var(--accent-mint));
+        background-size: 200% 100%;
+        animation: gradientShiftHero 4s ease infinite;
+    }
+
+    @keyframes gradientShiftHero {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .hero-summary-shape {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+        pointer-events: none;
+    }
+
+    .hero-shape-1 {
+        width: 280px;
+        height: 280px;
+        top: -140px;
+        right: -60px;
+        animation: floatShape 9s ease-in-out infinite;
+    }
+
+    .hero-shape-2 {
+        width: 160px;
+        height: 160px;
+        bottom: -80px;
+        right: 30%;
+        background: rgba(255, 255, 255, 0.05);
+        animation: floatShape 11s ease-in-out infinite reverse;
+    }
+
+    .hero-shape-3 {
+        width: 100px;
+        height: 100px;
+        top: 40%;
+        left: 25%;
+        background: rgba(255, 255, 255, 0.04);
+        animation: floatShape 13s ease-in-out infinite;
+    }
+
+    @keyframes floatShape {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(-15px, 15px) scale(1.08); }
+    }
+
+    .hero-summary-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 24px;
+    }
+
+    .hero-summary-left {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+    }
+
+    .hero-summary-icon {
+        width: 76px;
+        height: 76px;
+        min-width: 76px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 22px;
+        font-size: 2.4rem;
+        color: var(--violet-core);
+        box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.25);
+        position: relative;
+        transition: var(--transition-bounce);
+    }
+
+    .hero-summary-icon::before {
+        content: '';
+        position: absolute;
+        inset: -6px;
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.15);
+        z-index: -1;
+        animation: iconPulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes iconPulse {
+        0%, 100% { transform: scale(1); opacity: 0.6; }
+        50% { transform: scale(1.08); opacity: 0.3; }
+    }
+
+    .hero-summary-card:hover .hero-summary-icon {
+        transform: rotate(-8deg) scale(1.05);
+    }
+
+    .hero-summary-text { min-width: 0; }
+
+    .hero-summary-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        color: white;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 5px 12px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+    }
+
+    .hero-summary-badge i {
+        color: var(--accent-mint-light);
+        font-size: 0.85rem;
+    }
+
+    .hero-summary-title {
+        color: white;
+        font-weight: 800;
+        font-size: 1.75rem;
+        letter-spacing: -0.8px;
+        margin-bottom: 4px;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .hero-summary-subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .hero-summary-stats {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 18px;
+        padding: 18px 28px;
+    }
+
+    .hero-summary-stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .hero-summary-stat-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+
+    .hero-summary-stat-value {
+        color: white;
+        font-size: 1.7rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        line-height: 1;
+        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-summary-divider {
+        width: 1px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.2);
     }
 
     /* --- STAT CARDS --- */
@@ -388,9 +614,7 @@
         transition: transform 0.4s ease;
     }
 
-    .stat-card:hover::before {
-        transform: scaleX(1);
-    }
+    .stat-card:hover::before { transform: scaleX(1); }
 
     .stat-card:hover {
         transform: translateY(-6px);
@@ -429,7 +653,6 @@
         50% { box-shadow: 0 8px 30px -4px rgba(239, 68, 68, 0.25); }
     }
 
-    /* --- ICON BOXES --- */
     .icon-box {
         width: 54px;
         height: 54px;
@@ -442,9 +665,7 @@
         position: relative;
     }
 
-    .stat-card:hover .icon-box {
-        transform: scale(1.1) rotate(-8deg);
-    }
+    .stat-card:hover .icon-box { transform: scale(1.1) rotate(-8deg); }
 
     .icon-primary {
         background: linear-gradient(135deg, #EEF2FF 0%, #DBEAFE 100%);
@@ -464,7 +685,6 @@
         box-shadow: 0 4px 12px -4px rgba(239, 68, 68, 0.3);
     }
 
-    /* --- STAT TEXT --- */
     .stat-label {
         color: var(--text-muted);
         font-weight: 600;
@@ -484,15 +704,10 @@
         transition: var(--transition-smooth);
     }
 
-    .stat-card:hover .stat-value {
-        color: var(--primary-electric);
-        transform: translateX(4px);
-    }
-
+    .stat-card:hover .stat-value { color: var(--primary-electric); transform: translateX(4px); }
     .stat-card-success:hover .stat-value { color: var(--accent-mint); }
     .stat-card-danger:hover .stat-value { color: var(--rose-red); }
 
-    /* --- BADGES --- */
     .badge-trend {
         font-size: 0.75rem;
         font-weight: 700;
@@ -535,7 +750,6 @@
         50% { opacity: 0.5; transform: scale(1.5); }
     }
 
-    /* --- STAT PROGRESS BAR --- */
     .stat-progress {
         height: 4px;
         background: #F1F5F9;
@@ -646,11 +860,32 @@
         letter-spacing: -0.3px;
     }
 
-    .filter-subtitle {
-        font-size: 0.82rem;
+    .filter-subtitle { font-size: 0.82rem; }
+
+    .active-filter-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(135deg, #ECFDF5, #D1FAE5);
+        color: #059669;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 6px 14px;
+        border-radius: 20px;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        animation: badgePulse 2s ease-in-out infinite;
     }
 
-    /* --- FILTER LABELS & INPUTS --- */
+    @keyframes badgePulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.03); }
+    }
+
+    .active-filter-badge i {
+        font-size: 0.85rem;
+    }
+
+    /* --- FILTER INPUTS --- */
     .filter-label {
         display: block;
         font-weight: 700;
@@ -862,8 +1097,46 @@
         letter-spacing: -0.3px;
     }
 
-    .section-subtitle {
-        font-size: 0.85rem;
+    .section-subtitle { font-size: 0.85rem; }
+
+    /* View Toggle */
+    .view-toggle {
+        display: flex;
+        gap: 4px;
+        padding: 4px;
+        background: #F1F5F9;
+        border-radius: 12px;
+        border: 1px solid var(--border-light);
+    }
+
+    .view-toggle-btn {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9px;
+        border: none;
+        background: transparent;
+        color: var(--text-muted);
+        font-size: 1.05rem;
+        cursor: pointer;
+        transition: var(--transition-bounce);
+    }
+
+    .view-toggle-btn.active {
+        background: white;
+        color: var(--primary-electric);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
+
+    .view-toggle-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    .view-toggle-btn:not(.active):not(:disabled):hover {
+        color: var(--text-dark);
     }
 
     /* --- PREMIUM TABLE --- */
@@ -950,9 +1223,7 @@
         transition: var(--transition-smooth);
     }
 
-    .battery-row:hover .product-name {
-        color: var(--accent-mint);
-    }
+    .battery-row:hover .product-name { color: var(--accent-mint); }
 
     .product-meta {
         color: var(--text-muted);
@@ -991,37 +1262,7 @@
         transform: translateY(-1px);
     }
 
-    .battery-row:hover .plate-badge i {
-        color: var(--primary-electric);
-    }
-
-    /* Shop Badge */
-    .shop-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: #F8FAFC;
-        border: 1px solid var(--border-light);
-        color: var(--text-soft);
-        font-weight: 600;
-        font-size: 0.8rem;
-        padding: 7px 12px;
-        border-radius: 10px;
-        transition: var(--transition-bounce);
-        white-space: nowrap;
-    }
-
-    .shop-badge i {
-        color: var(--violet-core);
-        font-size: 0.95rem;
-    }
-
-    .battery-row:hover .shop-badge {
-        background: white;
-        border-color: rgba(139, 92, 246, 0.3);
-        color: var(--violet-deep);
-        transform: translateY(-1px);
-    }
+    .battery-row:hover .plate-badge i { color: var(--primary-electric); }
 
     /* Quantity Badges */
     .qty-badge {
@@ -1070,9 +1311,7 @@
 
     .qty-good .qty-dot { background: var(--accent-mint); }
 
-    .battery-row:hover .qty-badge {
-        transform: translateY(-1px) scale(1.05);
-    }
+    .battery-row:hover .qty-badge { transform: translateY(-1px) scale(1.05); }
 
     /* Value Tag */
     .value-tag {
@@ -1098,9 +1337,7 @@
     }
 
     /* --- EMPTY STATE --- */
-    .empty-state {
-        padding: 40px 20px;
-    }
+    .empty-state { padding: 40px 20px; }
 
     .empty-icon-wrapper {
         width: 90px;
@@ -1200,44 +1437,58 @@
     }
 
     @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(25px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(25px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .page-header { animation-delay: 0.05s; }
-    .row.g-4 .col-md-4:nth-child(1) .stat-card { animation-delay: 0.1s; }
-    .row.g-4 .col-md-4:nth-child(2) .stat-card { animation-delay: 0.2s; }
-    .row.g-4 .col-md-4:nth-child(3) .stat-card { animation-delay: 0.3s; }
-    .filter-card { animation-delay: 0.4s; }
-    .table-card { animation-delay: 0.5s; }
+    .hero-summary-card { animation-delay: 0.1s; }
+    .row.g-4 .col-md-4:nth-child(1) .stat-card { animation-delay: 0.15s; }
+    .row.g-4 .col-md-4:nth-child(2) .stat-card { animation-delay: 0.22s; }
+    .row.g-4 .col-md-4:nth-child(3) .stat-card { animation-delay: 0.29s; }
+    .filter-card { animation-delay: 0.36s; }
+    .table-card { animation-delay: 0.43s; }
 
-    /* Staggered row animation */
     .battery-row {
         opacity: 0;
         animation: fadeInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
 
-    .battery-row:nth-child(1) { animation-delay: 0.55s; }
-    .battery-row:nth-child(2) { animation-delay: 0.60s; }
-    .battery-row:nth-child(3) { animation-delay: 0.65s; }
-    .battery-row:nth-child(4) { animation-delay: 0.70s; }
-    .battery-row:nth-child(5) { animation-delay: 0.75s; }
-    .battery-row:nth-child(6) { animation-delay: 0.80s; }
-    .battery-row:nth-child(7) { animation-delay: 0.85s; }
-    .battery-row:nth-child(8) { animation-delay: 0.90s; }
+    .battery-row:nth-child(1) { animation-delay: 0.48s; }
+    .battery-row:nth-child(2) { animation-delay: 0.53s; }
+    .battery-row:nth-child(3) { animation-delay: 0.58s; }
+    .battery-row:nth-child(4) { animation-delay: 0.63s; }
+    .battery-row:nth-child(5) { animation-delay: 0.68s; }
+    .battery-row:nth-child(6) { animation-delay: 0.73s; }
+    .battery-row:nth-child(7) { animation-delay: 0.78s; }
+    .battery-row:nth-child(8) { animation-delay: 0.83s; }
 
     /* --- RESPONSIVE --- */
+    @media (max-width: 992px) {
+        .hero-summary-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .hero-summary-stats {
+            width: 100%;
+            justify-content: space-around;
+        }
+    }
+
     @media (max-width: 768px) {
         .page-title { font-size: 1.4rem; }
-        .page-header { flex-direction: column; align-items: flex-start !important; gap: 16px; }
-        .stat-value { font-size: 1.6rem; }
+        .hero-summary-card { padding: 24px 22px; }
+        .hero-summary-icon {
+            width: 60px;
+            height: 60px;
+            min-width: 60px;
+            font-size: 1.9rem;
+        }
+        .hero-summary-title { font-size: 1.3rem; }
+        .hero-summary-stat-value { font-size: 1.3rem; }
         .filter-header { flex-direction: column; align-items: flex-start; }
+        .active-filter-badge { margin-left: 0 !important; }
+        .view-toggle { margin-left: 0 !important; }
         .premium-table thead th,
         .premium-table tbody td { padding: 14px 12px; }
         .premium-table thead th:first-child,
@@ -1252,7 +1503,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Animate stat values counting up
-        document.querySelectorAll('.stat-value').forEach(function(el) {
+        document.querySelectorAll('.stat-value, .hero-summary-stat-value').forEach(function(el) {
             const target = parseInt(el.getAttribute('data-count')) || 0;
             if (target === 0) return;
             
@@ -1283,6 +1534,29 @@
                 }, 100);
             });
         }, 300);
+
+        // Add parallax to hero summary
+        const heroCard = document.querySelector('.hero-summary-card');
+        const heroShapes = document.querySelectorAll('.hero-summary-shape');
+        
+        if (heroCard && heroShapes.length) {
+            heroCard.addEventListener('mousemove', function(e) {
+                const rect = heroCard.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / rect.width - 0.5;
+                const y = (e.clientY - rect.top) / rect.height - 0.5;
+                
+                heroShapes.forEach((shape, index) => {
+                    const intensity = (index + 1) * 8;
+                    shape.style.transform = `translate(${x * intensity}px, ${y * intensity}px)`;
+                });
+            });
+
+            heroCard.addEventListener('mouseleave', function() {
+                heroShapes.forEach(shape => {
+                    shape.style.transform = '';
+                });
+            });
+        }
     });
 </script>
 @endsection

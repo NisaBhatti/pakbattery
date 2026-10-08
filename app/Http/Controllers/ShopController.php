@@ -4,27 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\Shop;
 use App\Models\Product;
-use App\Models\ShopStock;
-use App\Models\StockTransfer;       
-use App\Models\StockTransferItem;   
+use App\Models\StockTransfer;
+use App\Models\StockTransferItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ShopController extends Controller
 {
+    // ==================== SHOPS CRUD ====================
+    
     public function index()
     {
-        $shops = Shop::withCount('stocks')->latest()->paginate(10);
-        // Attach total batteries count to each shop
-        $shops->each(function ($shop) {
-            $shop->total_batteries = $shop->totalBatteries();
-        });
-        
+        $shops = Shop::latest()->paginate(10);
         return view('pages.shops.show', compact('shops'));
     }
 
     public function create()
     {
-        // Auto-generate next shop code
         $nextCode = 'SHOP-' . str_pad(Shop::count() + 1, 3, '0', STR_PAD_LEFT);
         return view('pages.shops.add', compact('nextCode'));
     }
@@ -46,12 +42,53 @@ class ShopController extends Controller
 
     public function show(Shop $shop)
     {
-        $shop->load('stocks.product');
-        $totalBatteries = $shop->totalBatteries();
-        $totalProducts = $shop->stocks()->count();
-        $lowStockCount = $shop->stocks()->where('quantity', '<=', 5)->count();
-        
-        return view('pages.shops.view', compact('shop', 'totalBatteries', 'totalProducts', 'lowStockCount'));
+        // Get all transfers where this shop was the destination
+        $receivedTransfers = StockTransfer::with('fromShop', 'items.product')
+            ->where('to_shop_id', $shop->id)
+            ->latest()
+            ->get();
+
+        // Get all transfers where this shop was the source
+        $sentTransfers = StockTransfer::with('toShop', 'items.product')
+            ->where('from_shop_id', $shop->id)
+            ->latest()
+            ->get();
+
+        // Group received stock by product (sum quantities)
+        $stockInShop = [];
+        foreach ($receivedTransfers as $transfer) {
+            foreach ($transfer->items as $item) {
+                $productId = $item->product_id;
+                if (!isset($stockInShop[$productId])) {
+                    $stockInShop[$productId] = [
+                        'product' => $item->product,
+                        'quantity' => 0,
+                    ];
+                }
+                $stockInShop[$productId]['quantity'] += $item->quantity;
+            }
+        }
+
+        // Also subtract what was sent OUT from this shop
+        foreach ($sentTransfers as $transfer) {
+            foreach ($transfer->items as $item) {
+                $productId = $item->product_id;
+                if (isset($stockInShop[$productId])) {
+                    $stockInShop[$productId]['quantity'] -= $item->quantity;
+                }
+            }
+        }
+
+        // Remove items with 0 or negative quantity
+        $stockInShop = array_filter($stockInShop, fn($s) => $s['quantity'] > 0);
+
+        $totalBatteries = collect($stockInShop)->sum('quantity');
+        $totalProducts = count($stockInShop);
+        $lowStockCount = collect($stockInShop)->where('quantity', '<=', 5)->count();
+
+        return view('pages.shops.view', compact(
+            'shop', 'stockInShop', 'totalBatteries', 'totalProducts', 'lowStockCount'
+        ));
     }
 
     public function edit(Shop $shop)
@@ -85,67 +122,56 @@ class ShopController extends Controller
         return view('pages.shops.delete', compact('shop'));
     }
 
-    /**
-     * Show all batteries (products) across all shops with filters
-     */
+    // ==================== BATTERIES OVERVIEW ====================
+    
     public function batteries(Request $request)
     {
-        $query = ShopStock::with('shop', 'product');
+        // Get all products with their current master stock
+        $query = Product::query();
 
-        // Filter by shop
-        if ($request->filled('shop_id')) {
-            $query->where('shop_id', $request->shop_id);
-        }
-
-        // Filter by product
-        if ($request->filled('product_id')) {
-            $query->where('product_id', $request->product_id);
-        }
-
-        // Filter by stock level
-        if ($request->filled('stock_level')) {
-            if ($request->stock_level === 'low') {
-                $query->where('quantity', '<=', 5);
-            } elseif ($request->stock_level === 'medium') {
-                $query->whereBetween('quantity', [6, 20]);
-            } elseif ($request->stock_level === 'high') {
-                $query->where('quantity', '>', 20);
-            }
-        }
-
-        // Search by product name or plate
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->whereHas('product', function ($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('plate_number', 'like', "%{$search}%");
             });
         }
 
-        $stocks = $query->latest()->paginate(15)->withQueryString();
+        if ($request->filled('product_id')) {
+            $query->where('id', $request->product_id);
+        }
 
-        // Stats
-        $totalBatteries = ShopStock::sum('quantity');
+        if ($request->filled('stock_level')) {
+            if ($request->stock_level === 'low') {
+                $query->where('stock', '<=', 5);
+            } elseif ($request->stock_level === 'medium') {
+                $query->whereBetween('stock', [6, 20]);
+            } elseif ($request->stock_level === 'high') {
+                $query->where('stock', '>', 20);
+            }
+        }
+
+        $products = $query->latest()->paginate(15)->withQueryString();
+
+        $totalBatteries = Product::sum('stock');
         $totalShops = Shop::count();
-        $lowStockCount = ShopStock::where('quantity', '<=', 5)->count();
+        $lowStockCount = Product::where('stock', '<=', 5)->count();
 
         $shops = Shop::orderBy('name')->get();
-        $products = Product::orderBy('name')->get();
+        $allProducts = Product::orderBy('name')->get();
 
         return view('pages.shops.batteries', compact(
-            'stocks', 'shops', 'products',
+            'products', 'shops', 'allProducts',
             'totalBatteries', 'totalShops', 'lowStockCount'
         ));
     }
 
-    /**
-     * Show the "Send Stock" page
-     */
+    // ==================== SEND STOCK ====================
+    
     public function sendStockIndex(Request $request)
     {
         $query = StockTransfer::with('fromShop', 'toShop', 'items');
 
-        // Filters
         if ($request->filled('from_shop_id')) {
             $query->where('from_shop_id', $request->from_shop_id);
         }
@@ -164,8 +190,7 @@ class ShopController extends Controller
 
         $transfers = $query->latest()->paginate(15)->withQueryString();
 
-        // Stats for cards
-        $totalBatteries = ShopStock::sum('quantity');
+        $totalBatteries = Product::sum('stock');
         $totalTransfers = StockTransfer::count();
         $totalTransferredQty = StockTransfer::sum('total_quantity');
 
@@ -177,20 +202,14 @@ class ShopController extends Controller
         ));
     }
 
-    /**
-     * Show the "Create Transfer" form
-     */
     public function createTransfer()
     {
-        $shops = Shop::where('is_active', true)->orderBy('name')->get();
+        $shops = Shop::orderBy('name')->get();
         $nextTransferNumber = 'TRF-' . date('Ymd') . '-' . str_pad(StockTransfer::count() + 1, 4, '0', STR_PAD_LEFT);
         
         return view('pages.shops.create-transfer', compact('shops', 'nextTransferNumber'));
     }
 
-    /**
-     * Store a new stock transfer
-     */
     public function storeTransfer(Request $request)
     {
         $request->validate([
@@ -202,21 +221,19 @@ class ShopController extends Controller
             'items.*.quantity' => 'required|integer|min:1',
         ]);
 
-        // Check stock availability in source shop
+        // Check master product stock
         foreach ($request->items as $item) {
-            $stock = ShopStock::where('shop_id', $request->from_shop_id)
-                ->where('product_id', $item['product_id'])
-                ->first();
-            
-            if (!$stock || $stock->quantity < $item['quantity']) {
-                $product = Product::find($item['product_id']);
-                $available = $stock ? $stock->quantity : 0;
-                return back()->with('error', "Not enough stock for {$product->name}. Available: {$available}")
+            $product = Product::find($item['product_id']);
+            if (!$product) {
+                return back()->with('error', "Product not found.")->withInput();
+            }
+            if ($product->stock < $item['quantity']) {
+                return back()->with('error', "Not enough stock for {$product->name}. Available: {$product->stock}, Requested: {$item['quantity']}")
                     ->withInput();
             }
         }
 
-        \DB::beginTransaction();
+        DB::beginTransaction();
         try {
             $totalQty = 0;
             
@@ -232,42 +249,49 @@ class ShopController extends Controller
             foreach ($request->items as $item) {
                 $totalQty += $item['quantity'];
 
-                \App\Models\StockTransferItem::create([
+                StockTransferItem::create([
                     'stock_transfer_id' => $transfer->id,
                     'product_id' => $item['product_id'],
                     'quantity' => $item['quantity'],
                 ]);
 
-                // Reduce from source shop
-                $fromStock = ShopStock::where('shop_id', $request->from_shop_id)
-                    ->where('product_id', $item['product_id'])
-                    ->first();
-                $fromStock->decrement('quantity', $item['quantity']);
-
-                // Add to destination shop (create if not exists)
-                $toStock = ShopStock::firstOrCreate(
-                    ['shop_id' => $request->to_shop_id, 'product_id' => $item['product_id']],
-                    ['quantity' => 0]
-                );
-                $toStock->increment('quantity', $item['quantity']);
+                // DEDUCT from master product stock
+                $product = Product::find($item['product_id']);
+                $product->decrement('stock', $item['quantity']);
             }
 
             $transfer->update(['total_quantity' => $totalQty]);
 
-            \DB::commit();
+            DB::commit();
             return redirect()->route('shops.send-stock')->with('success', 'Stock transferred successfully!');
         } catch (\Exception $e) {
-            \DB::rollBack();
+            DB::rollBack();
             return back()->with('error', 'Transfer failed: ' . $e->getMessage())->withInput();
         }
     }
 
-    /**
-     * View a single transfer
-     */
     public function viewTransfer(StockTransfer $transfer)
     {
         $transfer->load('fromShop', 'toShop', 'items.product');
         return view('pages.shops.view-transfer', compact('transfer'));
+    }
+
+    // ==================== API: Get All Products with Stock ====================
+    
+    public function productsJson()
+    {
+        $products = Product::where('stock', '>', 0)
+            ->orderBy('name')
+            ->get()
+            ->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'plate_number' => $product->plate_number,
+                    'quantity' => $product->stock,
+                ];
+            });
+
+        return response()->json($products);
     }
 }

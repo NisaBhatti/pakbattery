@@ -43,31 +43,17 @@ Route::resource('customers', CustomerController::class);
 Route::get('bills/{bill}/delete', [BillController::class, 'confirmDelete'])->name('bills.delete');
 Route::resource('bills', BillController::class);
 
+// Shops
 Route::get('shops/{shop}/delete', [ShopController::class, 'confirmDelete'])->name('shops.delete');
 
-// Shops - Batteries & Send Stock (must be BEFORE resource route to avoid conflicts)
+// Shops - Special Pages (must be BEFORE resource route)
 Route::get('shops/batteries', [ShopController::class, 'batteries'])->name('shops.batteries');
 Route::get('shops/send-stock', [ShopController::class, 'sendStockIndex'])->name('shops.send-stock');
 Route::get('shops/send-stock/create', [ShopController::class, 'createTransfer'])->name('shops.create-transfer');
 Route::post('shops/send-stock', [ShopController::class, 'storeTransfer'])->name('shops.store-transfer');
 Route::get('shops/transfers/{transfer}', [ShopController::class, 'viewTransfer'])->name('shops.view-transfer');
 
+// API endpoint - returns ALL products with current master stock
+Route::get('shops/products-json', [ShopController::class, 'productsJson'])->name('shops.products-json');
+
 Route::resource('shops', ShopController::class);
-
-
-
-Route::get('shops/{shop}/products-json', function ($shopId) {
-    $stocks = ShopStock::with('product')
-        ->where('shop_id', $shopId)
-        ->where('quantity', '>', 0)
-        ->get();
-    
-    return response()->json($stocks->map(function ($stock) {
-        return [
-            'id' => $stock->product_id,
-            'name' => $stock->product->name,
-            'plate_number' => $stock->product->plate_number,
-            'quantity' => $stock->quantity,
-        ];
-    }));
-})->name('shops.products-json');
