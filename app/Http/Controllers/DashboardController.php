@@ -2,96 +2,76 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Expense;
 use Illuminate\Http\Request;
+use App\Models\Product;
+use App\Models\Supplier;
+use App\Models\Customer;
+use App\Models\Purchase;
+use App\Models\Bill;
+use App\Models\Shop;
+use App\Models\Expense;
+use App\Models\StockTransfer;
 
-class ExpenseController extends Controller
+class DashboardController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $query = Expense::query();
+        // ==================== PRODUCT STATS ====================
+        $totalProducts = Product::count();
+        $lowStockCount = Product::where('stock', '<=', 5)->count();
+        $totalInventoryValue = Product::sum(\DB::raw('price * stock'));
 
-        // Filters
-        if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
-        }
+        // ==================== SUPPLIER & CUSTOMER STATS ====================
+        $totalSuppliers = Supplier::count();
+        $totalCustomers = Customer::count();
 
-        if ($request->filled('date_from')) {
-            $query->whereDate('expense_date', '>=', $request->date_from);
-        }
+        // ==================== SHOP STATS ====================
+        $totalShops = Shop::count();
+        $activeShops = Shop::where('is_active', true)->count();
 
-        if ($request->filled('date_to')) {
-            $query->whereDate('expense_date', '<=', $request->date_to);
-        }
+        // ==================== STOCK TRANSFER STATS ====================
+        $totalTransfers = StockTransfer::count();
+        $totalTransferredQty = StockTransfer::sum('total_quantity');
 
-        $expenses = $query->latest('expense_date')->paginate(15)->withQueryString();
+        // ==================== FINANCIAL STATS ====================
+        $totalPurchases = Purchase::sum('total_amount');
+        $totalSales = Bill::sum('total_amount');
+        $totalExpenses = Expense::sum('amount');
+        
+        // Net Profit = Sales - Purchases - Expenses
+        $netProfit = $totalSales - $totalPurchases - $totalExpenses;
 
-        // Stats
-        $totalExpense = Expense::sum('amount');
-        $thisMonthExpense = Expense::whereMonth('expense_date', now()->month)
-                                   ->whereYear('expense_date', now()->year)
-                                   ->sum('amount');
-        $todayExpense = Expense::whereDate('expense_date', today())->sum('amount');
+        // ==================== RECENT ACTIVITY ====================
+        $recentPurchases = Purchase::with('supplier')->latest()->take(5)->get();
+        $recentBills = Bill::with('customer')->latest()->take(5)->get();
+        $recentExpenses = Expense::latest('expense_date')->take(5)->get();
+        $recentTransfers = StockTransfer::with('fromShop', 'toShop')->latest()->take(5)->get();
 
-        return view('pages.expenses.show', compact(
-            'expenses',
-            'totalExpense',
-            'thisMonthExpense',
-            'todayExpense'
+        // ==================== LOW STOCK LIST ====================
+        $lowStockProducts = Product::where('stock', '<=', 5)
+            ->orderBy('stock', 'asc')
+            ->take(5)
+            ->get();
+
+        return view('pages.dashboard.dashboard', compact(
+            'totalProducts', 
+            'lowStockCount', 
+            'totalInventoryValue',
+            'totalSuppliers',
+            'totalCustomers',
+            'totalShops',
+            'activeShops',
+            'totalTransfers',
+            'totalTransferredQty',
+            'totalPurchases',
+            'totalSales',
+            'totalExpenses',
+            'netProfit',
+            'recentPurchases',
+            'recentBills',
+            'recentExpenses',
+            'recentTransfers',
+            'lowStockProducts'
         ));
-    }
-
-    public function create()
-    {
-        return view('pages.expenses.add');
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'amount' => 'required|numeric|min:0',
-            'expense_date' => 'required|date',
-            'description' => 'nullable|string',
-        ]);
-
-        Expense::create($request->all());
-
-        return redirect()->route('expenses.index')->with('success', 'Expense recorded successfully!');
-    }
-
-    public function show(Expense $expense)
-    {
-        return view('pages.expenses.view', compact('expense'));
-    }
-
-    public function edit(Expense $expense)
-    {
-        return view('pages.expenses.edit', compact('expense'));
-    }
-
-    public function update(Request $request, Expense $expense)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'amount' => 'required|numeric|min:0',
-            'expense_date' => 'required|date',
-            'description' => 'nullable|string',
-        ]);
-
-        $expense->update($request->all());
-
-        return redirect()->route('expenses.index')->with('success', 'Expense updated successfully!');
-    }
-
-    public function destroy(Expense $expense)
-    {
-        $expense->delete();
-        return redirect()->route('expenses.index')->with('success', 'Expense deleted successfully!');
-    }
-
-    public function confirmDelete(Expense $expense)
-    {
-        return view('pages.expenses.delete', compact('expense'));
     }
 }
