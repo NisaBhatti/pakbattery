@@ -20,114 +20,151 @@
 
 <div class="nav-category">Management</div>
 
-<ul class="nav flex-column">
-    
-    <!-- Suppliers with Submenu (AMBER THEME) -->
-    <li class="nav-item">
-        <a class="nav-link d-flex justify-content-between align-items-center {{ request()->routeIs('suppliers.*') || request()->routeIs('purchases.*') ? '' : 'collapsed' }}" 
-           data-bs-toggle="collapse" 
-           href="#supplierSubmenu" 
-           role="button" 
-           aria-expanded="{{ request()->routeIs('suppliers.*') || request()->routeIs('purchases.*') ? 'true' : 'false' }}">
-            <span><i class="ph ph-truck"></i> Suppliers</span>
-            <i class="ph ph-caret-down submenu-arrow"></i>
-        </a>
+<!-- Single parent wrapper for accordion behavior -->
+<div class="accordion-wrapper" id="managementAccordion">
+
+    <ul class="nav flex-column">
         
-        <div class="collapse {{ request()->routeIs('suppliers.*') || request()->routeIs('purchases.*') ? 'show' : '' }}" id="supplierSubmenu">
-            <ul class="nav flex-column submenu submenu-suppliers">
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('suppliers.index') ? 'active' : '' }}" href="{{ route('suppliers.index') }}">
-                        <i class="ph ph-list-dashes"></i> All Suppliers
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('purchases.index') ? 'active' : '' }}" href="{{ route('purchases.index') }}">
-                        <i class="ph ph-receipt"></i> All Invoices
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('purchases.create') ? 'active' : '' }}" href="{{ route('purchases.create') }}">
-                        <i class="ph ph-plus-circle"></i> Add Purchase
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </li>
+        <!-- Suppliers with Submenu (AMBER THEME) -->
+        <li class="nav-item">
+            <a class="nav-link submenu-toggle d-flex justify-content-between align-items-center {{ request()->routeIs('suppliers.*') || request()->routeIs('purchases.*') ? '' : 'collapsed' }}" 
+               data-bs-toggle="collapse" 
+               data-bs-parent="#managementAccordion"
+               href="#supplierSubmenu" 
+               role="button" 
+               aria-expanded="{{ request()->routeIs('suppliers.*') || request()->routeIs('purchases.*') ? 'true' : 'false' }}">
+                <span><i class="ph ph-truck"></i> Suppliers</span>
+                <i class="ph ph-caret-down submenu-arrow"></i>
+            </a>
+            
+            <div class="collapse {{ request()->routeIs('suppliers.*') || request()->routeIs('purchases.*') ? 'show' : '' }}" id="supplierSubmenu">
+                <ul class="nav flex-column submenu submenu-suppliers">
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('suppliers.index') ? 'active' : '' }}" href="{{ route('suppliers.index') }}">
+                            <i class="ph ph-list-dashes"></i> All Suppliers
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('purchases.index') ? 'active' : '' }}" href="{{ route('purchases.index') }}">
+                            <i class="ph ph-receipt"></i> All Invoices
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('purchases.create') ? 'active' : '' }}" href="{{ route('purchases.create') }}">
+                            <i class="ph ph-plus-circle"></i> Add Purchase
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
 
-    <!-- Customers with Submenu (PINK THEME) -->
-    <li class="nav-item">
-        <a class="nav-link d-flex justify-content-between align-items-center {{ request()->routeIs('customers.*') || request()->routeIs('bills.*') ? '' : 'collapsed' }}" 
-           data-bs-toggle="collapse" 
-           href="#customerSubmenu" 
-           role="button" 
-           aria-expanded="{{ request()->routeIs('customers.*') || request()->routeIs('bills.*') ? 'true' : 'false' }}">
-            <span><i class="ph ph-users"></i> Customers</span>
-            <i class="ph ph-caret-down submenu-arrow"></i>
-        </a>
-        
-        <div class="collapse {{ request()->routeIs('customers.*') || request()->routeIs('bills.*') ? 'show' : '' }}" id="customerSubmenu">
-            <ul class="nav flex-column submenu submenu-customers">
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('customers.index') ? 'active' : '' }}" href="{{ route('customers.index') }}">
-                        <i class="ph ph-list-dashes"></i> All Customers
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('bills.index') ? 'active' : '' }}" href="{{ route('bills.index') }}">
-                        <i class="ph ph-receipt"></i> All Bills
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('bills.create') ? 'active' : '' }}" href="{{ route('bills.create') }}">
-                        <i class="ph ph-plus-circle"></i> Add Bill
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </li>
+        <!-- Customers with Submenu (PINK THEME) -->
+        <li class="nav-item">
+            <a class="nav-link submenu-toggle d-flex justify-content-between align-items-center {{ request()->routeIs('customers.*') || request()->routeIs('bills.*') ? '' : 'collapsed' }}" 
+               data-bs-toggle="collapse" 
+               data-bs-parent="#managementAccordion"
+               href="#customerSubmenu" 
+               role="button" 
+               aria-expanded="{{ request()->routeIs('customers.*') || request()->routeIs('bills.*') ? 'true' : 'false' }}">
+                <span><i class="ph ph-users"></i> Customers</span>
+                <i class="ph ph-caret-down submenu-arrow"></i>
+            </a>
+            
+            <div class="collapse {{ request()->routeIs('customers.*') || request()->routeIs('bills.*') ? 'show' : '' }}" id="customerSubmenu">
+                <ul class="nav flex-column submenu submenu-customers">
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('customers.index') ? 'active' : '' }}" href="{{ route('customers.index') }}">
+                            <i class="ph ph-list-dashes"></i> All Customers
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('bills.index') ? 'active' : '' }}" href="{{ route('bills.index') }}">
+                            <i class="ph ph-receipt"></i> All Bills
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('bills.create') ? 'active' : '' }}" href="{{ route('bills.create') }}">
+                            <i class="ph ph-plus-circle"></i> Add Bill
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
 
-    <!-- Shops with Submenu (CYAN THEME) -->
-    <li class="nav-item">
-        <a class="nav-link d-flex justify-content-between align-items-center {{ request()->routeIs('shops.*') ? '' : 'collapsed' }}" 
-           data-bs-toggle="collapse" 
-           href="#shopSubmenu" 
-           role="button" 
-           aria-expanded="{{ request()->routeIs('shops.*') ? 'true' : 'false' }}">
-            <span><i class="ph ph-storefront"></i> Shops</span>
-            <i class="ph ph-caret-down submenu-arrow"></i>
-        </a>
-        
-        <div class="collapse {{ request()->routeIs('shops.*') ? 'show' : '' }}" id="shopSubmenu">
-            <ul class="nav flex-column submenu submenu-shops">
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('shops.index') ? 'active' : '' }}" href="{{ route('shops.index') }}">
-                        <i class="ph ph-list-dashes"></i> All Shops
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('shops.batteries') ? 'active' : '' }}" href="{{ route('shops.batteries') }}">
-                        <i class="ph ph-battery-charging"></i> Batteries
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('shops.send-stock') || request()->routeIs('shops.create-transfer') || request()->routeIs('shops.view-transfer') ? 'active' : '' }}" href="{{ route('shops.send-stock') }}">
-                        <i class="ph ph-paper-plane-tilt"></i> Send Stock
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </li>
+        <!-- Expenses with Submenu (EMERALD THEME) -->
+        <li class="nav-item">
+            <a class="nav-link submenu-toggle d-flex justify-content-between align-items-center {{ request()->routeIs('expenses.*') ? '' : 'collapsed' }}" 
+               data-bs-toggle="collapse" 
+               data-bs-parent="#managementAccordion"
+               href="#expenseSubmenu" 
+               role="button" 
+               aria-expanded="{{ request()->routeIs('expenses.*') ? 'true' : 'false' }}">
+                <span><i class="ph ph-receipt-x"></i> Expenses</span>
+                <i class="ph ph-caret-down submenu-arrow"></i>
+            </a>
+            
+            <div class="collapse {{ request()->routeIs('expenses.*') ? 'show' : '' }}" id="expenseSubmenu">
+                <ul class="nav flex-column submenu submenu-expenses">
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('expenses.index') ? 'active' : '' }}" href="{{ route('expenses.index') }}">
+                            <i class="ph ph-list-dashes"></i> All Expenses
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('expenses.create') ? 'active' : '' }}" href="{{ route('expenses.create') }}">
+                            <i class="ph ph-plus-circle"></i> Add Expense
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
 
-    <!-- Accounting / Reports -->
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="ph ph-currency-dollar"></i> Accounting
-        </a>
-    </li>
+        <!-- Shops with Submenu (CYAN THEME) -->
+        <li class="nav-item">
+            <a class="nav-link submenu-toggle d-flex justify-content-between align-items-center {{ request()->routeIs('shops.*') ? '' : 'collapsed' }}" 
+               data-bs-toggle="collapse" 
+               data-bs-parent="#managementAccordion"
+               href="#shopSubmenu" 
+               role="button" 
+               aria-expanded="{{ request()->routeIs('shops.*') ? 'true' : 'false' }}">
+                <span><i class="ph ph-storefront"></i> Shops</span>
+                <i class="ph ph-caret-down submenu-arrow"></i>
+            </a>
+            
+            <div class="collapse {{ request()->routeIs('shops.*') ? 'show' : '' }}" id="shopSubmenu">
+                <ul class="nav flex-column submenu submenu-shops">
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('shops.index') ? 'active' : '' }}" href="{{ route('shops.index') }}">
+                            <i class="ph ph-list-dashes"></i> All Shops
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('shops.batteries') ? 'active' : '' }}" href="{{ route('shops.batteries') }}">
+                            <i class="ph ph-battery-charging"></i> Batteries
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('shops.send-stock') || request()->routeIs('shops.create-transfer') || request()->routeIs('shops.view-transfer') ? 'active' : '' }}" href="{{ route('shops.send-stock') }}">
+                            <i class="ph ph-paper-plane-tilt"></i> Send Stock
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
 
-</ul>
+        <!-- Accounting / Reports -->
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="ph ph-currency-dollar"></i> Accounting
+            </a>
+        </li>
 
-<!-- Enhanced Submenu Styling — Multi-Color Theme -->
+    </ul>
+</div>
+
+<!-- ============================================
+     ENHANCED SIDEBAR STYLING — Multi-Color Theme
+     ============================================ -->
 <style>
     /* Submenu Arrow Rotation */
     .nav-link[aria-expanded="true"] .submenu-arrow { 
@@ -140,12 +177,43 @@
         color: #94A3B8;
     }
     
-    .nav-link:hover .submenu-arrow {
-        color: #3B82F6;
+    .nav-link:hover .submenu-arrow { color: #3B82F6; }
+    .nav-link[aria-expanded="true"] .submenu-arrow { color: #3B82F6; }
+
+    /* ============================================
+       ACCORDION PARENT HIGHLIGHT — Distinct from Submenu
+       ============================================ */
+    .submenu-toggle {
+        position: relative;
     }
 
-    .nav-link[aria-expanded="true"] .submenu-arrow {
-        color: #3B82F6;
+    /* Parent open state — subtle indication */
+    .submenu-toggle[aria-expanded="true"] {
+        color: #1E293B;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.06) 0%, rgba(16, 185, 129, 0.04) 100%);
+        font-weight: 700;
+    }
+
+    /* Left accent bar on open parent */
+    .submenu-toggle[aria-expanded="true"]::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 20%;
+        height: 60%;
+        width: 3px;
+        background: linear-gradient(180deg, var(--primary-electric), var(--accent-mint));
+        border-radius: 0 4px 4px 0;
+        animation: accentSlide 0.3s ease-out;
+    }
+
+    @keyframes accentSlide {
+        from { height: 0; top: 50%; }
+        to { height: 60%; top: 20%; }
+    }
+
+    .submenu-toggle[aria-expanded="true"] i:first-child {
+        color: var(--primary-electric);
     }
 
     /* ============================================
@@ -161,7 +229,6 @@
         transition: all 0.3s ease;
     }
 
-    /* Animated left border on submenu */
     .submenu::before {
         content: '';
         position: absolute;
@@ -174,11 +241,8 @@
         transition: opacity 0.3s ease;
     }
 
-    .submenu:hover::before {
-        opacity: 1;
-    }
+    .submenu:hover::before { opacity: 1; }
 
-    /* Submenu Links (Base) */
     .submenu .nav-link { 
         padding: 10px 18px; 
         margin: 2px 8px; 
@@ -191,7 +255,6 @@
         overflow: hidden;
     }
 
-    /* Sliding shine effect */
     .submenu .nav-link::before {
         content: '';
         position: absolute;
@@ -202,9 +265,7 @@
         transition: left 0.5s ease;
     }
 
-    .submenu .nav-link:hover::before {
-        left: 100%;
-    }
+    .submenu .nav-link:hover::before { left: 100%; }
 
     .submenu .nav-link i { 
         font-size: 1rem; 
@@ -213,7 +274,6 @@
         color: #94A3B8;
     }
 
-    /* Pulsing dot on active item */
     .submenu .nav-link.active::after {
         content: '';
         position: absolute;
@@ -231,17 +291,6 @@
         50% { opacity: 0.6; transform: translateY(-50%) scale(1.5); }
     }
 
-    /* Parent open highlight */
-    .nav-link[aria-expanded="true"] {
-        color: #3B82F6;
-        background: rgba(59, 130, 246, 0.05);
-    }
-
-    .nav-link[aria-expanded="true"] i:first-child {
-        color: #3B82F6;
-    }
-
-    /* Smooth collapse animation */
     .collapse, .collapsing {
         transition: height 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
@@ -276,9 +325,7 @@
         box-shadow: 0 6px 18px -4px rgba(245, 158, 11, 0.5);
         transform: translateX(4px) scale(1.02);
     }
-    .submenu-suppliers .nav-link.active i {
-        color: white;
-    }
+    .submenu-suppliers .nav-link.active i { color: white; }
     .submenu-suppliers .nav-link.active::after {
         background: #FEF3C7;
         box-shadow: 0 0 8px #F59E0B;
@@ -314,12 +361,46 @@
         box-shadow: 0 6px 18px -4px rgba(236, 72, 153, 0.5);
         transform: translateX(4px) scale(1.02);
     }
-    .submenu-customers .nav-link.active i {
-        color: white;
-    }
+    .submenu-customers .nav-link.active i { color: white; }
     .submenu-customers .nav-link.active::after {
         background: #FCE7F3;
         box-shadow: 0 0 8px #EC4899;
+    }
+
+    /* ============================================
+       EXPENSES SUBMENU — EMERALD/GREEN THEME (NEW)
+       ============================================ */
+    .submenu-expenses {
+        background: linear-gradient(135deg, rgba(5, 150, 105, 0.06) 0%, rgba(16, 185, 129, 0.04) 100%);
+    }
+    .submenu-expenses::before {
+        background: linear-gradient(180deg, #059669, #10B981);
+    }
+    .submenu-expenses .nav-link::before {
+        background: linear-gradient(90deg, transparent, rgba(5, 150, 105, 0.1), transparent);
+    }
+    .submenu-expenses .nav-link:hover {
+        color: #059669;
+        background: rgba(209, 250, 229, 0.6);
+        transform: translateX(6px) scale(1.02);
+        box-shadow: 0 4px 12px -4px rgba(5, 150, 105, 0.3);
+        font-weight: 600;
+    }
+    .submenu-expenses .nav-link:hover i {
+        color: #059669;
+        transform: scale(1.15) rotate(-5deg);
+    }
+    .submenu-expenses .nav-link.active {
+        color: white;
+        background: linear-gradient(105deg, #059669 0%, #10B981 100%);
+        font-weight: 700;
+        box-shadow: 0 6px 18px -4px rgba(5, 150, 105, 0.5);
+        transform: translateX(4px) scale(1.02);
+    }
+    .submenu-expenses .nav-link.active i { color: white; }
+    .submenu-expenses .nav-link.active::after {
+        background: #D1FAE5;
+        box-shadow: 0 0 8px #10B981;
     }
 
     /* ============================================
@@ -352,9 +433,7 @@
         box-shadow: 0 6px 18px -4px rgba(6, 182, 212, 0.5);
         transform: translateX(4px) scale(1.02);
     }
-    .submenu-shops .nav-link.active i {
-        color: white;
-    }
+    .submenu-shops .nav-link.active i { color: white; }
     .submenu-shops .nav-link.active::after {
         background: #CFFAFE;
         box-shadow: 0 0 8px #06B6D4;

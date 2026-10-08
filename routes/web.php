@@ -9,6 +9,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\BillController;
 use App\Http\Controllers\ShopController;
 use App\Models\ShopStock;
+use App\Http\Controllers\ExpenseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,3 +58,5 @@ Route::get('shops/transfers/{transfer}', [ShopController::class, 'viewTransfer']
 Route::get('shops/products-json', [ShopController::class, 'productsJson'])->name('shops.products-json');
 
 Route::resource('shops', ShopController::class);
+Route::get('expenses/{expense}/delete', [ExpenseController::class, 'confirmDelete'])->name('expenses.delete');
+Route::resource('expenses', ExpenseController::class);
