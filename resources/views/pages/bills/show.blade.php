@@ -111,7 +111,7 @@
                             <!-- Total -->
                             <td>
                                 <span class="total-amount">
-                                    ${{ number_format($bill->total_amount, 2) }}
+                                    Rs{{ number_format($bill->total_amount, 2) }}
                                 </span>
                             </td>
                             

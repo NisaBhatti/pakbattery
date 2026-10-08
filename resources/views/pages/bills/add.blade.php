@@ -1127,13 +1127,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const qty = parseFloat(row.querySelector('.quantity-input').value) || 0;
             const price = parseFloat(row.querySelector('.price-input').value) || 0;
             const subtotal = qty * price;
-            row.querySelector('.subtotal').textContent = '$' + subtotal.toFixed(2);
+            row.querySelector('.subtotal').textContent = 'Rs ' + subtotal.toFixed(2);
             if (qty > 0) {
                 grandTotal += subtotal;
                 itemCount++;
             }
         });
-        document.getElementById('grandTotal').textContent = '$' + grandTotal.toFixed(2);
+        document.getElementById('grandTotal').textContent = 'Rs ' + grandTotal.toFixed(2);
         document.getElementById('itemsCount').textContent = itemCount;
     }
 

@@ -102,7 +102,7 @@
                         </div>
                         <div class="info-content">
                             <span class="info-label">Price</span>
-                            <span class="info-value info-price">${{ number_format($product->price, 2) }}</span>
+                            <span class="info-value info-price">Rs {{ number_format($product->price, 2) }}</span>
                         </div>
                     </div>
                 </div>

@@ -222,7 +222,7 @@
                             </td>
                             <td class="pe-4 text-end">
                                 <span class="price-tag">
-                                    ${{ number_format($stock->product->price ?? 0, 2) }}
+                                    Rs {{ number_format($stock->product->price ?? 0, 2) }}
                                 </span>
                             </td>
                         </tr>

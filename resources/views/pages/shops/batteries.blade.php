@@ -298,7 +298,7 @@
                             <!-- Value -->
                             <td class="pe-4 text-end">
                                 <span class="value-tag">
-                                    ${{ number_format($product->price * $product->stock, 2) }}
+                                    Rs {{ number_format($product->price * $product->stock, 2) }}
                                 </span>
                             </td>
                         </tr>

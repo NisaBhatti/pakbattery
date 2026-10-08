@@ -74,7 +74,7 @@
                     </div>
                     <div class="detail-content">
                         <span class="detail-label">Total Amount</span>
-                        <span class="detail-value detail-price">${{ number_format($purchase->total_amount, 2) }}</span>
+                        <span class="detail-value detail-price">Rs {{ number_format($purchase->total_amount, 2) }}</span>
                     </div>
                 </div>
             </div>

@@ -167,10 +167,10 @@
                                         <span class="qty-badge">×{{ $item->quantity }}</span>
                                     </td>
                                     <td class="text-end">
-                                        <span class="unit-price">${{ number_format($item->unit_price, 2) }}</span>
+                                        <span class="unit-price">Rs {{ number_format($item->unit_price, 2) }}</span>
                                     </td>
                                     <td class="pe-4 text-end">
-                                        <span class="subtotal-value">${{ number_format($item->subtotal, 2) }}</span>
+                                        <span class="subtotal-value">Rs {{ number_format($item->subtotal, 2) }}</span>
                                     </td>
                                 </tr>
                                 @empty
@@ -191,7 +191,7 @@
                                         GRAND TOTAL
                                     </td>
                                     <td class="pe-4 text-end">
-                                        <span class="total-footer-value">${{ number_format($purchase->total_amount, 2) }}</span>
+                                        <span class="total-footer-value">Rs {{ number_format($purchase->total_amount, 2) }}</span>
                                     </td>
                                 </tr>
                             </tfoot>

@@ -97,7 +97,7 @@
                             <!-- Price -->
                             <td>
                                 <span class="price-tag">
-                                    ${{ number_format($product->price, 2) }}
+                                    Rs {{ number_format($product->price, 2) }}
                                 </span>
                             </td>
                             

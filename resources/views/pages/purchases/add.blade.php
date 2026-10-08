@@ -1122,7 +1122,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const price = parseFloat(row.querySelector('.price-input').value) || 0;
             const subtotal = qty * price;
             
-            row.querySelector('.subtotal').textContent = '$' + subtotal.toFixed(2);
+            row.querySelector('.subtotal').textContent = 'Rs ' + subtotal.toFixed(2);
             
             if (qty > 0) {
                 grandTotal += subtotal;
@@ -1130,7 +1130,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        document.getElementById('grandTotal').textContent = '$' + grandTotal.toFixed(2);
+        document.getElementById('grandTotal').textContent = 'Rs ' + grandTotal.toFixed(2);
         document.getElementById('itemsCount').textContent = itemCount;
     }
 
