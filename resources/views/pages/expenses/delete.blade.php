@@ -33,17 +33,17 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-center mb-3 pb-3" style="border-bottom: 1px dashed #E2E8F0;">
-                    <div class="icon-box-sm icon-success-soft me-3"><i class="ph ph-tag"></i></div>
+                    <div class="icon-box-sm icon-primary-soft me-3"><i class="ph ph-calendar"></i></div>
                     <div>
-                        <span class="d-block text-muted" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">Category</span>
-                        <span class="fw-bold" style="color: #0F172A;">{{ $expense->category }}</span>
+                        <span class="d-block text-muted" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">Date</span>
+                        <span class="fw-bold" style="color: #0F172A;">{{ \Carbon\Carbon::parse($expense->expense_date)->format('d M, Y') }}</span>
                     </div>
                 </div>
                 <div class="d-flex align-items-center">
-                    <div class="icon-box-sm icon-primary-soft me-3"><i class="ph ph-currency-dollar"></i></div>
+                    <div class="icon-box-sm icon-success-soft me-3"><i class="ph ph-currency-circle-dollar"></i></div>
                     <div>
                         <span class="d-block text-muted" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">Amount</span>
-                        <span class="fw-bold" style="color: #10B981;">${{ number_format($expense->amount, 2) }}</span>
+                        <span class="fw-bold" style="color: #10B981;">Rs {{ number_format($expense->amount, 2) }}</span>
                     </div>
                 </div>
             </div>
@@ -77,7 +77,7 @@
     .btn-cancel-confirm { background: white; border: 1px solid #E2E8F0; color: #475569; border-radius: 10px; padding: 12px 30px; font-weight: 700; text-decoration: none; transition: all 0.3s; }
     .btn-cancel-confirm:hover { background: #F8FAFC; color: #0F172A; }
     .btn-delete-confirm { background: #EF4444; border: none; color: white; border-radius: 10px; padding: 12px 30px; font-weight: 700; transition: all 0.3s; box-shadow: 0 8px 20px -6px rgba(239,68,68,0.5); }
-    .btn-delete-confirm:hover { background: #DC2626; transform: translateY(-2px); box-shadow: 0 12px 24px -8px rgba(239,68,68,0.6); }
+    .btn-delete-confirm:hover { background: #DC2626; transform: translateY(-2px); }
     .fade-in-up { animation: fadeInUp 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards; opacity: 0; }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(25px); } to { opacity: 1; transform: translateY(0); } }
 </style>

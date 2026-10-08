@@ -155,7 +155,7 @@
                                 <div class="total-divider"></div>
                                 <div class="total-row total-row-grand">
                                     <span class="total-grand-label">GRAND TOTAL</span>
-                                    <h3 class="total-grand-value" id="grandTotal">$0.00</h3>
+                                    <h3 class="total-grand-value" id="grandTotal">Rs 0.00</h3>
                                 </div>
                             </div>
                         </div>
@@ -1085,7 +1085,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <input type="number" step="0.01" name="items[${rowCounter}][unit_price]" class="price-input text-end" value="0.00" min="0" required>
             </td>
             <td class="text-end">
-                <span class="subtotal">$0.00</span>
+                <span class="subtotal">Rs 0.00</span>
             </td>
             <td class="text-center pe-4">
                 <button type="button" class="btn-delete-row" onclick="removeRow('${rowId}')" title="Remove">

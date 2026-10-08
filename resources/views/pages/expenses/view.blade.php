@@ -32,7 +32,7 @@
                         </div>
                         <div class="hero-text">
                             <span class="hero-badge">
-                                <i class="ph ph-tag"></i> {{ $expense->category }}
+                                <i class="ph ph-calendar"></i> Expense
                             </span>
                             <h2 class="hero-title">{{ $expense->title }}</h2>
                             <p class="hero-subtitle">
@@ -43,7 +43,7 @@
                     </div>
                     <div class="hero-total">
                         <span class="hero-total-label">AMOUNT</span>
-                        <h1 class="hero-total-value">${{ number_format($expense->amount, 2) }}</h1>
+                        <h1 class="hero-total-value">Rs {{ number_format($expense->amount, 2) }}</h1>
                     </div>
                 </div>
             </div>
@@ -63,20 +63,10 @@
 
                 <div class="col-md-6">
                     <div class="info-box">
-                        <div class="info-icon icon-primary-soft"><i class="ph ph-tag"></i></div>
-                        <div class="info-content">
-                            <span class="info-label">Category</span>
-                            <span class="info-value">{{ $expense->category }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="info-box">
-                        <div class="info-icon icon-success-soft"><i class="ph ph-currency-dollar"></i></div>
+                        <div class="info-icon icon-success-soft"><i class="ph ph-currency-circle-dollar"></i></div>
                         <div class="info-content">
                             <span class="info-label">Amount</span>
-                            <span class="info-value" style="color: #10B981;">${{ number_format($expense->amount, 2) }}</span>
+                            <span class="info-value" style="color: #10B981;">Rs {{ number_format($expense->amount, 2) }}</span>
                         </div>
                     </div>
                 </div>
@@ -91,20 +81,10 @@
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <div class="info-box">
-                        <div class="info-icon icon-primary-soft"><i class="ph ph-credit-card"></i></div>
-                        <div class="info-content">
-                            <span class="info-label">Payment Method</span>
-                            <span class="info-value">{{ $expense->payment_method ?? 'N/A' }}</span>
-                        </div>
-                    </div>
-                </div>
-
                 @if($expense->description)
                 <div class="col-md-12">
                     <div class="info-box">
-                        <div class="info-icon icon-success-soft"><i class="ph ph-note-pencil"></i></div>
+                        <div class="info-icon icon-primary-soft"><i class="ph ph-note-pencil"></i></div>
                         <div class="info-content">
                             <span class="info-label">Description</span>
                             <span class="info-value">{{ $expense->description }}</span>
@@ -126,10 +106,8 @@
     .btn-back { background: white; border: 1px solid var(--border-light); color: var(--text-dark); border-radius: 12px; padding: 11px 22px; font-weight: 600; display: inline-flex; align-items: center; transition: var(--transition-bounce); text-decoration: none; }
     .btn-back:hover { color: var(--violet-deep); border-color: var(--violet-core); }
     .btn-edit-action { background: linear-gradient(105deg, #F59E0B, #D97706); border: none; color: white; border-radius: 12px; padding: 11px 22px; font-weight: 600; display: inline-flex; align-items: center; transition: var(--transition-bounce); text-decoration: none; box-shadow: 0 8px 20px -6px rgba(245, 158, 11, 0.5); }
-    .btn-edit-action:hover { transform: translateY(-3px); color: white; box-shadow: 0 15px 30px -8px rgba(245, 158, 11, 0.6); }
-
+    .btn-edit-action:hover { transform: translateY(-3px); color: white; }
     .details-card { background: white; border-radius: 24px; border: 1px solid rgba(226, 232, 240, 0.6); overflow: hidden; box-shadow: 0 8px 40px -12px rgba(15, 23, 42, 0.08); }
-
     .hero-header { background: linear-gradient(135deg, var(--violet-core) 0%, var(--violet-deep) 50%, #5B21B6 100%); padding: 40px 45px; position: relative; overflow: hidden; }
     .hero-header::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent); animation: shineSweep 5s ease-in-out infinite; }
     @keyframes shineSweep { 0%, 100% { left: -100%; } 50% { left: 100%; } }
@@ -146,7 +124,6 @@
     .hero-total { text-align: right; }
     .hero-total-label { display: block; color: rgba(255,255,255,0.75); font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; margin-bottom: 8px; }
     .hero-total-value { color: white; font-weight: 800; font-size: 2.5rem; letter-spacing: -1.5px; margin: 0; line-height: 1; }
-
     .info-box { display: flex; align-items: center; padding: 20px 22px; background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%); border-radius: 16px; border: 1px solid #F1F5F9; transition: var(--transition-bounce); height: 100%; }
     .info-box:hover { background: white; box-shadow: 0 12px 30px -10px rgba(139, 92, 246, 0.15); transform: translateY(-4px); }
     .info-icon { width: 52px; height: 52px; min-width: 52px; display: flex; align-items: center; justify-content: center; border-radius: 14px; font-size: 1.4rem; margin-right: 16px; }
@@ -156,7 +133,6 @@
     .info-content { flex: 1; }
     .info-label { display: block; font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
     .info-value { display: block; font-size: 1rem; color: var(--text-dark); font-weight: 700; word-break: break-word; }
-
     .fade-in-up { animation: fadeInUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; opacity: 0; }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(25px); } to { opacity: 1; transform: translateY(0); } }
     @media (max-width: 768px) {

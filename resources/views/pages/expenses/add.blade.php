@@ -51,22 +51,9 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label-premium">Category <span class="required-star">*</span></label>
+                        <label class="form-label-premium">Amount (Rs) <span class="required-star">*</span></label>
                         <div class="input-group-premium">
-                            <span class="input-icon"><i class="ph ph-tag"></i></span>
-                            <select name="category" class="form-control-premium" required>
-                                <option value="">-- Select Category --</option>
-                                @foreach($categories as $cat)
-                                    <option value="{{ $cat }}" {{ old('category') == $cat ? 'selected' : '' }}>{{ $cat }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label-premium">Amount <span class="required-star">*</span></label>
-                        <div class="input-group-premium">
-                            <span class="input-icon"><i class="ph ph-currency-dollar"></i></span>
+                            <span class="input-icon"><i class="ph ph-currency-circle-dollar"></i></span>
                             <input type="number" step="0.01" name="amount" class="form-control-premium" value="{{ old('amount') }}" required placeholder="0.00">
                         </div>
                     </div>
@@ -76,20 +63,6 @@
                         <div class="input-group-premium">
                             <span class="input-icon"><i class="ph ph-calendar"></i></span>
                             <input type="date" name="expense_date" class="form-control-premium" value="{{ old('expense_date', date('Y-m-d')) }}" required>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label-premium">Payment Method</label>
-                        <div class="input-group-premium">
-                            <span class="input-icon"><i class="ph ph-credit-card"></i></span>
-                            <select name="payment_method" class="form-control-premium">
-                                <option value="">-- Select Method --</option>
-                                <option value="Cash" {{ old('payment_method') == 'Cash' ? 'selected' : '' }}>Cash</option>
-                                <option value="Bank Transfer" {{ old('payment_method') == 'Bank Transfer' ? 'selected' : '' }}>Bank Transfer</option>
-                                <option value="Card" {{ old('payment_method') == 'Card' ? 'selected' : '' }}>Card</option>
-                                <option value="Cheque" {{ old('payment_method') == 'Cheque' ? 'selected' : '' }}>Cheque</option>
-                            </select>
                         </div>
                     </div>
 
@@ -142,7 +115,6 @@
     .input-group-premium:focus-within .input-icon { background: linear-gradient(135deg, var(--violet-core), var(--violet-deep)); color: white; }
     .form-control-premium { flex: 1; border: none; background: transparent; padding: 16px 20px; font-size: 1rem; font-weight: 600; color: var(--text-dark); outline: none; font-family: inherit; min-width: 0; }
     .form-control-premium::placeholder { color: #CBD5E1; font-weight: 500; }
-    select.form-control-premium { appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 16px center; background-size: 14px; padding-right: 44px; cursor: pointer; }
     textarea.form-control-premium { resize: vertical; }
     .form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--border-light); }
     .btn-cancel { background: white; border: 1px solid var(--border-light); color: var(--text-soft); border-radius: 12px; padding: 13px 28px; font-weight: 600; display: inline-flex; align-items: center; transition: var(--transition-bounce); text-decoration: none; }

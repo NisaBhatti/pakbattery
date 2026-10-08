@@ -2,73 +2,96 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Expense;
 use Illuminate\Http\Request;
-use App\Models\Product;
-use App\Models\Supplier;
-use App\Models\Customer;
-use App\Models\Purchase;
-use App\Models\Bill;
 
-class DashboardController extends Controller
+class ExpenseController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // ==================== PRODUCT STATS ====================
-        $totalProducts = Product::count();
-        
-        // Count products with low stock (5 or less)
-        $lowStockCount = Product::where('stock', '<=', 5)->count();
-        
-        // Total inventory value (price * stock)
-        $totalInventoryValue = Product::sum(\DB::raw('price * stock'));
+        $query = Expense::query();
 
-        // ==================== SUPPLIER & CUSTOMER STATS ====================
-        $totalSuppliers = Supplier::count();
-        $totalCustomers = Customer::count();
+        // Filters
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
 
-        // ==================== FINANCIAL STATS ====================
-        // Total amount spent on purchases (money going out)
-        $totalPurchases = Purchase::sum('total_amount');
-        
-        // Total amount earned from bills (money coming in)
-        $totalSales = Bill::sum('total_amount');
-        
-        // Net Profit / Loss
-        $netProfit = $totalSales - $totalPurchases;
+        if ($request->filled('date_from')) {
+            $query->whereDate('expense_date', '>=', $request->date_from);
+        }
 
-        // ==================== RECENT ACTIVITY ====================
-        // Recent 5 purchases with supplier info
-        $recentPurchases = Purchase::with('supplier')
-            ->latest()
-            ->take(5)
-            ->get();
+        if ($request->filled('date_to')) {
+            $query->whereDate('expense_date', '<=', $request->date_to);
+        }
 
-        // Recent 5 bills with customer info
-        $recentBills = Bill::with('customer')
-            ->latest()
-            ->take(5)
-            ->get();
+        $expenses = $query->latest('expense_date')->paginate(15)->withQueryString();
 
-        // ==================== LOW STOCK LIST ====================
-        // Get the actual products that are low on stock
-        $lowStockProducts = Product::where('stock', '<=', 5)
-            ->orderBy('stock', 'asc')
-            ->take(5)
-            ->get();
+        // Stats
+        $totalExpense = Expense::sum('amount');
+        $thisMonthExpense = Expense::whereMonth('expense_date', now()->month)
+                                   ->whereYear('expense_date', now()->year)
+                                   ->sum('amount');
+        $todayExpense = Expense::whereDate('expense_date', today())->sum('amount');
 
-        // Points to: resources/views/pages/dashboard/dashboard.blade.php
-        return view('pages.dashboard.dashboard', compact(
-            'totalProducts', 
-            'lowStockCount', 
-            'totalInventoryValue',
-            'totalSuppliers',
-            'totalCustomers',
-            'totalPurchases',
-            'totalSales',
-            'netProfit',
-            'recentPurchases',
-            'recentBills',
-            'lowStockProducts'
+        return view('pages.expenses.show', compact(
+            'expenses',
+            'totalExpense',
+            'thisMonthExpense',
+            'todayExpense'
         ));
+    }
+
+    public function create()
+    {
+        return view('pages.expenses.add');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:0',
+            'expense_date' => 'required|date',
+            'description' => 'nullable|string',
+        ]);
+
+        Expense::create($request->all());
+
+        return redirect()->route('expenses.index')->with('success', 'Expense recorded successfully!');
+    }
+
+    public function show(Expense $expense)
+    {
+        return view('pages.expenses.view', compact('expense'));
+    }
+
+    public function edit(Expense $expense)
+    {
+        return view('pages.expenses.edit', compact('expense'));
+    }
+
+    public function update(Request $request, Expense $expense)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:0',
+            'expense_date' => 'required|date',
+            'description' => 'nullable|string',
+        ]);
+
+        $expense->update($request->all());
+
+        return redirect()->route('expenses.index')->with('success', 'Expense updated successfully!');
+    }
+
+    public function destroy(Expense $expense)
+    {
+        $expense->delete();
+        return redirect()->route('expenses.index')->with('success', 'Expense deleted successfully!');
+    }
+
+    public function confirmDelete(Expense $expense)
+    {
+        return view('pages.expenses.delete', compact('expense'));
     }
 }

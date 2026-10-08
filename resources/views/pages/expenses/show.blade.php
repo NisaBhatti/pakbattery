@@ -40,7 +40,7 @@
                         <span class="badge badge-trend badge-trend-up"><i class="ph ph-trend-up me-1"></i>Total</span>
                     </div>
                     <h6 class="stat-label">Total Expenses</h6>
-                    <h2 class="stat-value">${{ number_format($totalExpense, 2) }}</h2>
+                    <h2 class="stat-value">Rs {{ number_format($totalExpense, 2) }}</h2>
                     <div class="stat-progress"><div class="stat-progress-bar" style="width: 85%;"></div></div>
                 </div>
             </div>
@@ -55,7 +55,7 @@
                         <span class="badge badge-trend badge-trend-up"><i class="ph ph-check-circle me-1"></i>This Month</span>
                     </div>
                     <h6 class="stat-label">This Month</h6>
-                    <h2 class="stat-value">${{ number_format($thisMonthExpense, 2) }}</h2>
+                    <h2 class="stat-value">Rs {{ number_format($thisMonthExpense, 2) }}</h2>
                     <div class="stat-progress"><div class="stat-progress-bar" style="width: 60%;"></div></div>
                 </div>
             </div>
@@ -70,7 +70,7 @@
                         <span class="badge badge-alert"><span class="alert-dot"></span> Today</span>
                     </div>
                     <h6 class="stat-label">Today's Expenses</h6>
-                    <h2 class="stat-value">${{ number_format($todayExpense, 2) }}</h2>
+                    <h2 class="stat-value">Rs {{ number_format($todayExpense, 2) }}</h2>
                     <div class="stat-progress"><div class="stat-progress-bar" style="width: 30%;"></div></div>
                 </div>
             </div>
@@ -91,7 +91,7 @@
 
             <form method="GET" action="{{ route('expenses.index') }}">
                 <div class="row g-3">
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-4 col-md-6">
                         <label class="filter-label">Search</label>
                         <div class="filter-input-wrapper">
                             <span class="filter-input-icon"><i class="ph ph-magnifying-glass"></i></span>
@@ -99,25 +99,13 @@
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6">
-                        <label class="filter-label">Category</label>
-                        <div class="filter-input-wrapper">
-                            <span class="filter-input-icon"><i class="ph ph-tag"></i></span>
-                            <select name="category" class="filter-select">
-                                <option value="">All Categories</option>
-                                @foreach(\App\Models\Expense::categories() as $cat)
-                                    <option value="{{ $cat }}" {{ request('category') == $cat ? 'selected' : '' }}>{{ $cat }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
                         <label class="filter-label">Date From</label>
                         <div class="filter-input-wrapper">
                             <span class="filter-input-icon"><i class="ph ph-calendar"></i></span>
                             <input type="date" name="date_from" class="filter-control" value="{{ request('date_from') }}">
                         </div>
                     </div>
-                    <div class="col-lg-2 col-md-6">
+                    <div class="col-lg-3 col-md-6">
                         <label class="filter-label">Date To</label>
                         <div class="filter-input-wrapper">
                             <span class="filter-input-icon"><i class="ph ph-calendar"></i></span>
@@ -156,9 +144,7 @@
                     <thead>
                         <tr>
                             <th class="ps-4">Expense</th>
-                            <th>Category</th>
                             <th>Date</th>
-                            <th>Payment</th>
                             <th class="text-end">Amount</th>
                             <th class="pe-4 text-end">Actions</th>
                         </tr>
@@ -173,15 +159,10 @@
                                         <span class="shop-name">{{ $expense->title }}</span>
                                         <small class="shop-manager">
                                             <i class="ph ph-note"></i>
-                                            {{ Str::limit($expense->description, 30) ?? 'No description' }}
+                                            {{ Str::limit($expense->description, 40) ?? 'No description' }}
                                         </small>
                                     </div>
                                 </div>
-                            </td>
-                            <td>
-                                <span class="code-badge">
-                                    <i class="ph ph-tag"></i> {{ $expense->category }}
-                                </span>
                             </td>
                             <td>
                                 <span class="contact-badge">
@@ -189,18 +170,9 @@
                                     {{ \Carbon\Carbon::parse($expense->expense_date)->format('d M, Y') }}
                                 </span>
                             </td>
-                            <td>
-                                @if($expense->payment_method)
-                                    <span class="contact-badge">
-                                        <i class="ph ph-credit-card"></i> {{ $expense->payment_method }}
-                                    </span>
-                                @else
-                                    <span class="text-muted-na">N/A</span>
-                                @endif
-                            </td>
                             <td class="text-end">
                                 <span class="stock-badge">
-                                    <i class="ph ph-currency-dollar"></i> {{ number_format($expense->amount, 2) }}
+                                    <i class="ph ph-currency-circle-dollar"></i> Rs {{ number_format($expense->amount, 2) }}
                                 </span>
                             </td>
                             <td class="pe-4 text-end">
@@ -219,7 +191,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center py-5">
+                            <td colspan="4" class="text-center py-5">
                                 <div class="empty-state">
                                     <div class="empty-icon-wrapper"><i class="ph ph-receipt-x"></i></div>
                                     <h5 class="empty-title">No expenses yet</h5>
@@ -286,7 +258,6 @@
     .alert-content strong { display: block; margin-bottom: 2px; font-size: 0.95rem; }
     .alert-content span { font-size: 0.875rem; }
 
-    /* Stat Cards */
     .stat-card { background: var(--surface-card); border-radius: 20px; border: 1px solid rgba(226, 232, 240, 0.6); position: relative; overflow: hidden; transition: var(--transition-bounce); cursor: pointer; height: 100%; box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.04); }
     .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--violet-core), var(--accent-mint)); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; }
     .stat-card:hover::before { transform: scaleX(1); }
@@ -314,7 +285,6 @@
     .stat-progress { height: 4px; background: #F1F5F9; border-radius: 10px; overflow: hidden; }
     .stat-progress-bar { height: 100%; background: linear-gradient(90deg, var(--violet-core), var(--accent-mint)); border-radius: 10px; transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
 
-    /* Filter Card */
     .filter-card { background: var(--surface-card); border-radius: 24px; border: 1px solid rgba(226, 232, 240, 0.6); position: relative; overflow: hidden; box-shadow: 0 8px 40px -12px rgba(15, 23, 42, 0.08); }
     .filter-card-border { position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--violet-core), var(--accent-mint), var(--violet-core)); background-size: 200% 100%; animation: gradientShiftFilter 4s ease infinite; }
     @keyframes gradientShiftFilter { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
@@ -330,13 +300,11 @@
     .filter-input-wrapper:focus-within .filter-input-icon { background: linear-gradient(135deg, var(--violet-core), var(--violet-deep)); color: white; }
     .filter-control, .filter-select { flex: 1; border: none; background: transparent; padding: 11px 14px; font-size: 0.88rem; font-weight: 600; color: var(--text-dark); outline: none; font-family: inherit; min-width: 0; }
     .filter-control::placeholder { color: #CBD5E1; font-weight: 500; }
-    .filter-select { appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 12px; padding-right: 34px; cursor: pointer; }
     .btn-filter-apply { background: linear-gradient(105deg, var(--violet-core) 0%, var(--violet-deep) 100%); border: none; color: white; border-radius: 12px; padding: 11px 20px; font-weight: 700; font-size: 0.88rem; display: inline-flex; align-items: center; justify-content: center; transition: var(--transition-bounce); box-shadow: 0 8px 20px -6px rgba(139, 92, 246, 0.5); white-space: nowrap; }
     .btn-filter-apply:hover { transform: translateY(-2px) scale(1.02); color: white; box-shadow: 0 14px 28px -8px rgba(139, 92, 246, 0.6); }
     .btn-filter-reset { background: white; border: 1.5px solid var(--border-light); color: var(--text-soft); border-radius: 12px; padding: 11px 14px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; transition: var(--transition-bounce); text-decoration: none; min-width: 44px; }
     .btn-filter-reset:hover { background: #FEF2F2; color: var(--rose-red); border-color: var(--rose-red); transform: translateY(-2px); }
 
-    /* Table Card */
     .table-card { background: var(--surface-card); border-radius: 24px; border: 1px solid rgba(226, 232, 240, 0.6); position: relative; overflow: hidden; box-shadow: 0 8px 40px -12px rgba(15, 23, 42, 0.08); }
     .table-card-border { position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--violet-core), var(--accent-mint), var(--violet-core)); background-size: 200% 100%; animation: gradientShiftTable 4s ease infinite; }
     @keyframes gradientShiftTable { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
@@ -368,17 +336,12 @@
     .shop-manager { display: flex; align-items: center; gap: 5px; color: var(--text-muted); font-size: 0.78rem; font-weight: 500; }
     .shop-manager i { font-size: 0.9rem; }
 
-    .code-badge { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%); border: 1px solid rgba(139, 92, 246, 0.15); color: var(--violet-deep); font-weight: 700; font-size: 0.8rem; padding: 7px 14px; border-radius: 10px; transition: var(--transition-bounce); }
-    .shop-row:hover .code-badge { transform: translateY(-2px) scale(1.05); box-shadow: 0 8px 18px -6px rgba(139, 92, 246, 0.35); }
-
     .contact-badge { display: inline-flex; align-items: center; gap: 6px; background: #F8FAFC; border: 1px solid var(--border-light); color: var(--text-soft); font-weight: 600; font-size: 0.8rem; padding: 7px 12px; border-radius: 10px; transition: var(--transition-bounce); white-space: nowrap; }
     .shop-row:hover .contact-badge { background: white; border-color: rgba(139, 92, 246, 0.25); color: var(--violet-deep); }
 
     .stock-badge { display: inline-flex; align-items: center; gap: 7px; background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%); border: 1px solid rgba(16, 185, 129, 0.15); color: #059669; font-weight: 800; font-size: 0.85rem; padding: 7px 14px; border-radius: 10px; }
     .shop-row:hover .stock-badge { transform: translateY(-2px) scale(1.05); box-shadow: 0 8px 18px -6px rgba(16, 185, 129, 0.35); }
-    .text-muted-na { color: var(--text-muted); font-size: 0.85rem; font-weight: 500; font-style: italic; }
 
-    /* Action Buttons */
     .btn-action { width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; border-radius: 11px; border: 1px solid var(--border-light); background: white; font-size: 1.1rem; transition: var(--transition-bounce); text-decoration: none; }
     .btn-action:hover { transform: translateY(-3px) scale(1.08); }
     .btn-view { color: var(--violet-core); }
@@ -394,14 +357,12 @@
     .empty-title { color: var(--text-dark); font-weight: 700; margin-bottom: 8px; }
     .empty-subtitle { color: var(--text-muted); font-size: 0.9rem; }
 
-    /* Pagination */
     .pagination-wrapper { display: flex; justify-content: space-between; align-items: center; padding: 20px 28px; border-top: 1px solid var(--border-light); background: linear-gradient(135deg, rgba(248, 250, 252, 0.4) 0%, rgba(255, 255, 255, 0.4) 100%); flex-wrap: wrap; gap: 12px; }
     .pagination-info { color: var(--text-muted); font-size: 0.85rem; font-weight: 500; }
     .pagination .page-item .page-link { color: var(--text-soft); background: white; border: 1px solid var(--border-light); border-radius: 10px; padding: 8px 14px; font-weight: 600; font-size: 0.85rem; margin: 0 2px; transition: var(--transition-bounce); min-width: 40px; text-align: center; }
     .pagination .page-item .page-link:hover { background: #F8FAFC; color: var(--violet-deep); border-color: var(--violet-core); transform: translateY(-2px); }
     .pagination .page-item.active .page-link { background: linear-gradient(105deg, var(--violet-core) 0%, var(--violet-deep) 100%); border-color: transparent; color: white; }
 
-    /* Animations */
     .fade-in-up { animation: fadeInUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; opacity: 0; }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(25px); } to { opacity: 1; transform: translateY(0); } }
     .page-header { animation-delay: 0.05s; }
@@ -411,8 +372,6 @@
     .shop-row:nth-child(1) { animation-delay: 0.45s; }
     .shop-row:nth-child(2) { animation-delay: 0.5s; }
     .shop-row:nth-child(3) { animation-delay: 0.55s; }
-    .shop-row:nth-child(4) { animation-delay: 0.6s; }
-    .shop-row:nth-child(5) { animation-delay: 0.65s; }
 
     @media (max-width: 768px) {
         .page-title { font-size: 1.4rem; }
