@@ -11,11 +11,47 @@ use Illuminate\Support\Facades\DB;
 
 class BillController extends Controller
 {
-    public function index()
-    {
-        $bills = Bill::with('customer')->latest()->paginate(10);
-        return view('pages.bills.show', compact('bills'));
+  public function index(Request $request)
+{
+    $query = Bill::with('customer');
+
+    // Filter: Search by bill number OR customer name
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('bill_number', 'like', "%{$search}%")
+              ->orWhereHas('customer', function ($cq) use ($search) {
+                  $cq->where('name', 'like', "%{$search}%");
+              });
+        });
     }
+
+    // Filter: Date From
+    if ($request->filled('date_from')) {
+        $query->whereDate('bill_date', '>=', $request->date_from);
+    }
+
+    // Filter: Date To
+    if ($request->filled('date_to')) {
+        $query->whereDate('bill_date', '<=', $request->date_to);
+    }
+
+    $bills = $query->latest()->paginate(15)->withQueryString();
+
+    // ==================== STATS ====================
+    $totalBills = Bill::count();
+    $totalSales = Bill::sum('total_amount');
+    $thisMonthSales = Bill::whereMonth('bill_date', now()->month)
+                          ->whereYear('bill_date', now()->year)
+                          ->sum('total_amount');
+
+    return view('pages.bills.show', compact(
+        'bills',
+        'totalBills',
+        'totalSales',
+        'thisMonthSales'
+    ));
+}
 
     public function create()
     {

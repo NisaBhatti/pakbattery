@@ -45,6 +45,149 @@
         </div>
     @endif
 
+    <!-- Stats Cards Row — Premium -->
+    <div class="row g-4 mb-4">
+        
+        <!-- Total Bills -->
+        <div class="col-md-4">
+            <div class="stat-card stat-card-primary fade-in-up">
+                <div class="stat-card-glow"></div>
+                <div class="card-body p-4 position-relative">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="icon-box icon-primary">
+                            <i class="ph ph-receipt"></i>
+                        </div>
+                        <span class="badge badge-trend badge-trend-up">
+                            <i class="ph ph-receipt me-1"></i>All Time
+                        </span>
+                    </div>
+                    <h6 class="stat-label">Total Bills</h6>
+                    <h2 class="stat-value" data-count="{{ $totalBills }}">{{ $totalBills }}</h2>
+                    <div class="stat-progress">
+                        <div class="stat-progress-bar" style="width: 85%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Sales Amount -->
+        <div class="col-md-4">
+            <div class="stat-card stat-card-success fade-in-up">
+                <div class="stat-card-glow"></div>
+                <div class="card-body p-4 position-relative">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="icon-box icon-success">
+                            <i class="ph ph-currency-circle-dollar"></i>
+                        </div>
+                        <span class="badge badge-trend badge-trend-up">
+                            <i class="ph ph-trend-up me-1"></i>Revenue
+                        </span>
+                    </div>
+                    <h6 class="stat-label">Total Sales</h6>
+                    <h2 class="stat-value" style="font-size: 1.5rem;">Rs {{ number_format($totalSales, 2) }}</h2>
+                    <div class="stat-progress">
+                        <div class="stat-progress-bar" style="width: 90%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- This Month Sales -->
+        <div class="col-md-4">
+            <div class="stat-card stat-card-warning fade-in-up">
+                <div class="stat-card-glow"></div>
+                <div class="card-body p-4 position-relative">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="icon-box icon-warning">
+                            <i class="ph ph-calendar-check"></i>
+                        </div>
+                        <span class="badge badge-trend badge-trend-up">
+                            <i class="ph ph-calendar me-1"></i>{{ now()->format('M Y') }}
+                        </span>
+                    </div>
+                    <h6 class="stat-label">This Month</h6>
+                    <h2 class="stat-value" style="font-size: 1.5rem;">Rs {{ number_format($thisMonthSales, 2) }}</h2>
+                    <div class="stat-progress">
+                        <div class="stat-progress-bar" style="width: 70%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Filters Card — Premium -->
+    <div class="filter-card fade-in-up mb-4">
+        <div class="filter-card-border"></div>
+        
+        <div class="card-body p-4 p-md-5 position-relative">
+            <!-- Filter Header -->
+            <div class="filter-header">
+                <div class="filter-header-icon">
+                    <i class="ph ph-funnel"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0 filter-title">Filters</h6>
+                    <p class="text-muted mb-0 filter-subtitle">Refine your bill search results</p>
+                </div>
+            </div>
+
+            <form method="GET" action="{{ route('bills.index') }}">
+                <div class="row g-3">
+                    <!-- Search -->
+                    <div class="col-lg-4 col-md-6">
+                        <label class="filter-label">Search</label>
+                        <div class="filter-input-wrapper">
+                            <span class="filter-input-icon">
+                                <i class="ph ph-magnifying-glass"></i>
+                            </span>
+                            <input type="text" name="search" 
+                                   class="filter-control" 
+                                   placeholder="Bill # or customer name..." 
+                                   value="{{ request('search') }}">
+                        </div>
+                    </div>
+                    
+                    <!-- Date From -->
+                    <div class="col-lg-3 col-md-6">
+                        <label class="filter-label">Date From</label>
+                        <div class="filter-input-wrapper">
+                            <span class="filter-input-icon">
+                                <i class="ph ph-calendar"></i>
+                            </span>
+                            <input type="date" name="date_from" 
+                                   class="filter-control" 
+                                   value="{{ request('date_from') }}">
+                        </div>
+                    </div>
+                    
+                    <!-- Date To -->
+                    <div class="col-lg-3 col-md-6">
+                        <label class="filter-label">Date To</label>
+                        <div class="filter-input-wrapper">
+                            <span class="filter-input-icon">
+                                <i class="ph ph-calendar"></i>
+                            </span>
+                            <input type="date" name="date_to" 
+                                   class="filter-control" 
+                                   value="{{ request('date_to') }}">
+                        </div>
+                    </div>
+                    
+                    <!-- Filter Actions -->
+                    <div class="col-lg-2 col-md-12 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn-filter-apply w-100">
+                            <i class="ph ph-magnifying-glass me-1"></i> Filter
+                        </button>
+                        <a href="{{ route('bills.index') }}" class="btn-filter-reset" title="Reset Filters">
+                            <i class="ph ph-x"></i>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Main Table Card — Premium -->
     <div class="table-card fade-in-up">
         <!-- Animated Top Gradient Border (Rose-Magenta → Azure) -->
@@ -58,13 +201,8 @@
             <div>
                 <h5 class="fw-bold mb-0 section-title">All Bills</h5>
                 <p class="text-muted mb-0 section-subtitle">
-                    {{ $bills->total() ?? $bills->count() }} bill{{ ($bills->total() ?? $bills->count()) !== 1 ? 's' : '' }} issued
+                    {{ $bills->total() ?? $bills->count() }} bill{{ ($bills->total() ?? $bills->count()) !== 1 ? 's' : '' }} found
                 </p>
-            </div>
-            <!-- Search Box -->
-            <div class="search-wrapper ms-auto">
-                <i class="ph ph-magnifying-glass search-icon"></i>
-                <input type="text" class="search-input" id="billSearch" placeholder="Search bills...">
             </div>
         </div>
 
@@ -96,7 +234,9 @@
                                     <div class="icon-box-sm icon-customer-soft me-3">
                                         <i class="ph ph-user"></i>
                                     </div>
-                                    <span class="customer-name">{{ $bill->customer->name ?? 'N/A' }}</span>
+                                    <span class="customer-name">
+                                        {{ $bill->customer->name ?? 'Regular Customer' }}
+                                    </span>
                                 </div>
                             </td>
                             
@@ -111,7 +251,7 @@
                             <!-- Total -->
                             <td>
                                 <span class="total-amount">
-                                    Rs{{ number_format($bill->total_amount, 2) }}
+                                    Rs {{ number_format($bill->total_amount, 2) }}
                                 </span>
                             </td>
                             
@@ -137,8 +277,8 @@
                                     <div class="empty-icon-wrapper">
                                         <i class="ph ph-receipt"></i>
                                     </div>
-                                    <h5 class="empty-title">No bills yet</h5>
-                                    <p class="empty-subtitle">Get started by creating your first sale.</p>
+                                    <h5 class="empty-title">No bills found</h5>
+                                    <p class="empty-subtitle">Try adjusting your filters or create a new bill.</p>
                                     <a href="{{ route('bills.create') }}" class="btn btn-primary-gradient mt-3">
                                         <i class="ph ph-plus-circle me-1"></i> Add New Bill
                                     </a>
@@ -157,7 +297,7 @@
                     Showing {{ $bills->firstItem() }} to {{ $bills->lastItem() }} of {{ $bills->total() }} results
                 </div>
                 <div class="pagination-links">
-                    {{ $bills->links() }}
+                    {{ $bills->appends(request()->query())->links() }}
                 </div>
             </div>
             @endif
@@ -207,9 +347,7 @@
         transition: width 0.4s ease;
     }
 
-    .page-header:hover .page-title::after {
-        width: 100%;
-    }
+    .page-header:hover .page-title::after { width: 100%; }
 
     .page-subtitle {
         font-size: 0.9rem;
@@ -217,9 +355,7 @@
         align-items: center;
     }
 
-    .page-subtitle i {
-        color: var(--rose-magenta);
-    }
+    .page-subtitle i { color: var(--rose-magenta); }
 
     /* --- GRADIENT BUTTON --- */
     .btn-primary-gradient {
@@ -235,6 +371,7 @@
         box-shadow: 0 8px 20px -6px rgba(236, 72, 153, 0.5);
         display: inline-flex;
         align-items: center;
+        text-decoration: none;
     }
 
     .btn-primary-gradient::before {
@@ -256,11 +393,152 @@
         color: white;
     }
 
-    .btn-primary-gradient:hover i {
-        transform: rotate(180deg) scale(1.2);
+    .btn-primary-gradient:hover i { transform: rotate(180deg) scale(1.2); }
+    .btn-primary-gradient i { transition: var(--transition-bounce); }
+
+    /* --- STAT CARDS --- */
+    .stat-card {
+        background: var(--surface-card);
+        border-radius: 20px;
+        border: 1px solid rgba(226, 232, 240, 0.6);
+        position: relative;
+        overflow: hidden;
+        transition: var(--transition-bounce);
+        height: 100%;
+        box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.04);
     }
 
-    .btn-primary-gradient i { transition: var(--transition-bounce); }
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--rose-magenta), var(--accent-mint));
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s ease;
+    }
+
+    .stat-card:hover::before { transform: scaleX(1); }
+
+    .stat-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 40px -12px rgba(236, 72, 153, 0.18);
+        border-color: rgba(236, 72, 153, 0.2);
+    }
+
+    .stat-card-glow {
+        position: absolute;
+        top: -50%; right: -50%;
+        width: 200%; height: 200%;
+        background: radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+    }
+
+    .stat-card:hover .stat-card-glow { opacity: 1; }
+    .stat-card-success .stat-card-glow { background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%); }
+    .stat-card-warning .stat-card-glow { background: radial-gradient(circle, rgba(245, 158, 11, 0.08) 0%, transparent 70%); }
+
+    /* --- ICON BOXES --- */
+    .icon-box {
+        width: 54px; height: 54px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 14px;
+        font-size: 1.6rem;
+        transition: var(--transition-bounce);
+    }
+
+    .stat-card:hover .icon-box { transform: scale(1.1) rotate(-8deg); }
+
+    .icon-primary {
+        background: linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%);
+        color: var(--rose-magenta-deep);
+        box-shadow: 0 4px 12px -4px rgba(236, 72, 153, 0.3);
+    }
+
+    .icon-success {
+        background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+        color: var(--accent-mint);
+        box-shadow: 0 4px 12px -4px rgba(16, 185, 129, 0.3);
+    }
+
+    .icon-warning {
+        background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+        color: var(--warm-amber);
+        box-shadow: 0 4px 12px -4px rgba(245, 158, 11, 0.3);
+    }
+
+    /* --- STAT TEXT --- */
+    .stat-label {
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        color: var(--text-dark);
+        font-weight: 800;
+        font-size: 2rem;
+        letter-spacing: -1px;
+        margin-bottom: 16px;
+        line-height: 1;
+        transition: var(--transition-smooth);
+    }
+
+    .stat-card:hover .stat-value { color: var(--rose-magenta-deep); transform: translateX(4px); }
+    .stat-card-success:hover .stat-value { color: var(--accent-mint); }
+    .stat-card-warning:hover .stat-value { color: var(--warm-amber); }
+
+    /* --- BADGES --- */
+    .badge-trend {
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        transition: var(--transition-bounce);
+        background: linear-gradient(135deg, #FDF2F8, #FCE7F3);
+        color: var(--rose-magenta-deep);
+    }
+
+    .badge-trend-up { background: linear-gradient(135deg, #ECFDF5, #D1FAE5); color: #059669; }
+    .stat-card:hover .badge-trend { transform: scale(1.1); }
+
+    /* --- STAT PROGRESS BAR --- */
+    .stat-progress {
+        height: 4px;
+        background: #F1F5F9;
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .stat-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--rose-magenta), var(--accent-mint));
+        border-radius: 10px;
+        transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+    }
+
+    .stat-progress-bar::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+        animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
 
     /* --- SUCCESS ALERT --- */
     .alert-success-premium {
@@ -281,21 +559,16 @@
     .alert-success-premium::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
+        top: 0; left: 0;
+        width: 4px; height: 100%;
         background: var(--accent-mint);
         border-radius: 4px 0 0 4px;
     }
 
     .alert-success-premium .alert-icon-wrapper {
-        width: 40px;
-        height: 40px;
+        width: 40px; height: 40px;
         min-width: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex; align-items: center; justify-content: center;
         background: rgba(16, 185, 129, 0.15);
         border-radius: 12px;
         font-size: 1.4rem;
@@ -309,9 +582,9 @@
         100% { transform: scale(1); }
     }
 
-    .alert-success-premium .alert-content { flex: 1; }
-    .alert-success-premium .alert-content strong { display: block; margin-bottom: 2px; font-size: 0.95rem; }
-    .alert-success-premium .alert-content span { font-size: 0.875rem; }
+    .alert-content { flex: 1; }
+    .alert-content strong { display: block; margin-bottom: 2px; font-size: 0.95rem; }
+    .alert-content span { font-size: 0.875rem; }
 
     /* --- ERROR ALERT --- */
     .alert-error-premium {
@@ -332,21 +605,16 @@
     .alert-error-premium::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
+        top: 0; left: 0;
+        width: 4px; height: 100%;
         background: var(--rose-red);
         border-radius: 4px 0 0 4px;
     }
 
     .alert-error-premium .alert-icon-wrapper-error {
-        width: 40px;
-        height: 40px;
+        width: 40px; height: 40px;
         min-width: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex; align-items: center; justify-content: center;
         background: rgba(239, 68, 68, 0.15);
         border-radius: 12px;
         font-size: 1.4rem;
@@ -360,9 +628,182 @@
         75% { transform: translateX(4px); }
     }
 
-    .alert-error-premium .alert-content { flex: 1; }
-    .alert-error-premium .alert-content strong { display: block; margin-bottom: 2px; font-size: 0.95rem; }
-    .alert-error-premium .alert-content span { font-size: 0.875rem; }
+    /* --- FILTER CARD --- */
+    .filter-card {
+        background: var(--surface-card);
+        border-radius: 24px;
+        border: 1px solid rgba(226, 232, 240, 0.6);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 40px -12px rgba(15, 23, 42, 0.08);
+        transition: var(--transition-smooth);
+    }
+
+    .filter-card:hover {
+        box-shadow: 0 20px 60px -16px rgba(236, 72, 153, 0.12);
+        border-color: rgba(236, 72, 153, 0.15);
+    }
+
+    .filter-card-border {
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--rose-magenta), var(--accent-mint), var(--rose-magenta));
+        background-size: 200% 100%;
+        animation: gradientShiftFilter 4s ease infinite;
+    }
+
+    @keyframes gradientShiftFilter {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .filter-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding-bottom: 20px;
+        margin-bottom: 24px;
+        border-bottom: 1px solid var(--border-light);
+        position: relative;
+    }
+
+    .filter-header::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--rose-magenta), var(--accent-mint));
+        border-radius: 10px;
+    }
+
+    .filter-header-icon {
+        width: 46px; height: 46px;
+        min-width: 46px;
+        display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%);
+        border-radius: 13px;
+        font-size: 1.35rem;
+        color: var(--rose-magenta-deep);
+        box-shadow: 0 6px 16px -6px rgba(236, 72, 153, 0.35);
+        transition: var(--transition-bounce);
+    }
+
+    .filter-card:hover .filter-header-icon { transform: rotate(-8deg) scale(1.05); }
+
+    .filter-title { color: var(--text-dark); font-size: 1.05rem; letter-spacing: -0.3px; }
+    .filter-subtitle { font-size: 0.82rem; }
+
+    .filter-label {
+        display: block;
+        font-weight: 700;
+        font-size: 0.72rem;
+        color: var(--text-soft);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 8px;
+    }
+
+    .filter-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: stretch;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1.5px solid var(--border-light);
+        background: #F8FAFC;
+        transition: var(--transition-bounce);
+    }
+
+    .filter-input-wrapper:focus-within {
+        border-color: var(--rose-magenta);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1), 0 6px 16px -6px rgba(236, 72, 153, 0.25);
+        transform: translateY(-1px);
+    }
+
+    .filter-input-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 12px;
+        background: rgba(226, 232, 240, 0.4);
+        color: var(--text-muted);
+        font-size: 1.05rem;
+        transition: var(--transition-bounce);
+    }
+
+    .filter-input-wrapper:focus-within .filter-input-icon {
+        background: linear-gradient(135deg, var(--rose-magenta), var(--rose-magenta-deep));
+        color: white;
+    }
+
+    .filter-control, .filter-select {
+        flex: 1;
+        border: none;
+        background: transparent;
+        padding: 11px 14px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        outline: none;
+        font-family: inherit;
+        transition: var(--transition-smooth);
+        min-width: 0;
+    }
+
+    .filter-control::placeholder { color: #CBD5E1; font-weight: 500; }
+
+    .btn-filter-apply {
+        background: linear-gradient(105deg, var(--rose-magenta) 0%, var(--rose-magenta-deep) 100%);
+        border: none;
+        color: white;
+        border-radius: 12px;
+        padding: 11px 20px;
+        font-weight: 700;
+        font-size: 0.88rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition-bounce);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 20px -6px rgba(236, 72, 153, 0.5);
+        white-space: nowrap;
+    }
+
+    .btn-filter-apply:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 14px 28px -8px rgba(236, 72, 153, 0.6);
+        color: white;
+    }
+
+    .btn-filter-reset {
+        background: white;
+        border: 1.5px solid var(--border-light);
+        color: var(--text-soft);
+        border-radius: 12px;
+        padding: 11px 14px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition-bounce);
+        text-decoration: none;
+        min-width: 44px;
+    }
+
+    .btn-filter-reset:hover {
+        background: #FEF2F2;
+        color: var(--rose-red);
+        border-color: var(--rose-red);
+        transform: translateY(-2px);
+    }
+
+    .btn-filter-reset:hover i { transform: rotate(90deg); }
+    .btn-filter-reset i { transition: var(--transition-bounce); }
 
     /* --- TABLE CARD --- */
     .table-card {
@@ -380,12 +821,9 @@
         border-color: rgba(236, 72, 153, 0.15);
     }
 
-    /* Animated top gradient border — bill themed */
     .table-card-border {
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
+        top: 0; left: 0; right: 0;
         height: 4px;
         background: linear-gradient(90deg, var(--rose-magenta), var(--accent-mint), var(--rose-magenta));
         background-size: 200% 100%;
@@ -409,12 +847,9 @@
     }
 
     .section-icon {
-        width: 52px;
-        height: 52px;
+        width: 52px; height: 52px;
         min-width: 52px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex; align-items: center; justify-content: center;
         border-radius: 14px;
         font-size: 1.5rem;
         transition: var(--transition-bounce);
@@ -426,19 +861,10 @@
         box-shadow: 0 8px 20px -8px rgba(236, 72, 153, 0.4);
     }
 
-    .table-card:hover .section-icon {
-        transform: rotate(-8deg) scale(1.05);
-    }
+    .table-card:hover .section-icon { transform: rotate(-8deg) scale(1.05); }
 
-    .section-title {
-        color: var(--text-dark);
-        font-size: 1.1rem;
-        letter-spacing: -0.3px;
-    }
-
-    .section-subtitle {
-        font-size: 0.85rem;
-    }
+    .section-title { color: var(--text-dark); font-size: 1.1rem; letter-spacing: -0.3px; }
+    .section-subtitle { font-size: 0.85rem; }
 
     /* --- SEARCH BOX --- */
     .search-wrapper {
@@ -472,20 +898,10 @@
         font-family: inherit;
     }
 
-    .search-input::placeholder {
-        color: #CBD5E1;
-        font-weight: 400;
-    }
-
     .search-input:focus {
         border-color: var(--rose-magenta);
         box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.1);
         transform: translateY(-2px);
-    }
-
-    .search-wrapper:focus-within .search-icon {
-        color: var(--rose-magenta);
-        transform: translateY(-50%) scale(1.15);
     }
 
     /* --- PREMIUM TABLE --- */
@@ -550,11 +966,6 @@
         transition: var(--transition-bounce);
     }
 
-    .bill-number-badge i {
-        font-size: 0.9rem;
-        opacity: 0.7;
-    }
-
     .bill-row:hover .bill-number-badge {
         transform: translateY(-2px) scale(1.05);
         box-shadow: 0 8px 18px -6px rgba(236, 72, 153, 0.35);
@@ -563,12 +974,9 @@
 
     /* Customer Icon Box */
     .icon-box-sm {
-        width: 42px;
-        height: 42px;
+        width: 42px; height: 42px;
         min-width: 42px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex; align-items: center; justify-content: center;
         border-radius: 12px;
         font-size: 1.25rem;
         transition: var(--transition-bounce);
@@ -580,9 +988,7 @@
         box-shadow: 0 4px 12px -4px rgba(236, 72, 153, 0.3);
     }
 
-    .bill-row:hover .icon-box-sm {
-        transform: scale(1.1) rotate(-8deg);
-    }
+    .bill-row:hover .icon-box-sm { transform: scale(1.1) rotate(-8deg); }
 
     /* Customer Name */
     .customer-name {
@@ -593,9 +999,7 @@
         transition: var(--transition-smooth);
     }
 
-    .bill-row:hover .customer-name {
-        color: var(--rose-magenta-deep);
-    }
+    .bill-row:hover .customer-name { color: var(--rose-magenta-deep); }
 
     /* Date Badge */
     .date-badge {
@@ -613,12 +1017,6 @@
         white-space: nowrap;
     }
 
-    .date-badge i {
-        color: var(--text-muted);
-        font-size: 0.95rem;
-        transition: var(--transition-bounce);
-    }
-
     .bill-row:hover .date-badge {
         background: white;
         border-color: rgba(16, 185, 129, 0.3);
@@ -626,9 +1024,7 @@
         transform: translateY(-1px);
     }
 
-    .bill-row:hover .date-badge i {
-        color: var(--accent-mint);
-    }
+    .bill-row:hover .date-badge i { color: var(--accent-mint); }
 
     /* Total Amount */
     .total-amount {
@@ -639,15 +1035,11 @@
         transition: var(--transition-smooth);
     }
 
-    .bill-row:hover .total-amount {
-        color: #059669;
-        transform: scale(1.05);
-    }
+    .bill-row:hover .total-amount { color: #059669; transform: scale(1.05); }
 
     /* --- ACTION BUTTONS --- */
     .btn-action {
-        width: 38px;
-        height: 38px;
+        width: 38px; height: 38px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -656,72 +1048,30 @@
         background: white;
         font-size: 1.1rem;
         transition: var(--transition-bounce);
-        position: relative;
-        overflow: hidden;
         text-decoration: none;
     }
 
-    .btn-action::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+    .btn-action:hover { transform: translateY(-3px) scale(1.08); }
 
-    .btn-action:hover {
-        transform: translateY(-3px) scale(1.08);
-    }
-
-    .btn-action:hover::before { opacity: 1; }
-
-    /* View button */
     .btn-view { color: var(--primary-electric); }
-    .btn-view::before { background: linear-gradient(135deg, #EEF2FF 0%, #DBEAFE 100%); }
-    .btn-view:hover {
-        border-color: var(--primary-electric);
-        box-shadow: 0 8px 20px -8px rgba(59, 130, 246, 0.5);
-        color: var(--primary-electric);
-    }
+    .btn-view:hover { border-color: var(--primary-electric); box-shadow: 0 8px 20px -8px rgba(59, 130, 246, 0.5); }
 
-    /* Edit button */
     .btn-edit { color: var(--warm-amber); }
-    .btn-edit::before { background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); }
-    .btn-edit:hover {
-        border-color: var(--warm-amber);
-        box-shadow: 0 8px 20px -8px rgba(245, 158, 11, 0.5);
-        color: #D97706;
-    }
+    .btn-edit:hover { border-color: var(--warm-amber); box-shadow: 0 8px 20px -8px rgba(245, 158, 11, 0.5); color: #D97706; }
 
-    /* Delete button */
     .btn-delete { color: var(--rose-red); }
-    .btn-delete::before { background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%); }
-    .btn-delete:hover {
-        border-color: var(--rose-red);
-        box-shadow: 0 8px 20px -8px rgba(239, 68, 68, 0.5);
-        color: var(--rose-red);
-    }
+    .btn-delete:hover { border-color: var(--rose-red); box-shadow: 0 8px 20px -8px rgba(239, 68, 68, 0.5); }
 
-    .btn-action i {
-        position: relative;
-        z-index: 1;
-        transition: var(--transition-bounce);
-    }
-
+    .btn-action i { transition: var(--transition-bounce); }
     .btn-action:hover i { transform: scale(1.15); }
 
     /* --- EMPTY STATE --- */
-    .empty-state {
-        padding: 40px 20px;
-    }
+    .empty-state { padding: 40px 20px; }
 
     .empty-icon-wrapper {
-        width: 90px;
-        height: 90px;
+        width: 90px; height: 90px;
         margin: 0 auto 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex; align-items: center; justify-content: center;
         background: linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%);
         border-radius: 24px;
         font-size: 2.8rem;
@@ -735,17 +1085,8 @@
         50% { transform: translateY(-8px) rotate(5deg); }
     }
 
-    .empty-title {
-        color: var(--text-dark);
-        font-weight: 700;
-        margin-bottom: 8px;
-    }
-
-    .empty-subtitle {
-        color: var(--text-muted);
-        font-size: 0.9rem;
-        margin-bottom: 0;
-    }
+    .empty-title { color: var(--text-dark); font-weight: 700; margin-bottom: 8px; }
+    .empty-subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0; }
 
     /* --- PAGINATION --- */
     .pagination-wrapper {
@@ -759,16 +1100,7 @@
         gap: 12px;
     }
 
-    .pagination-info {
-        color: var(--text-muted);
-        font-size: 0.85rem;
-        font-weight: 500;
-    }
-
-    .pagination-links .pagination {
-        margin: 0;
-        gap: 4px;
-    }
+    .pagination-info { color: var(--text-muted); font-size: 0.85rem; font-weight: 500; }
 
     .pagination .page-item .page-link {
         color: var(--text-soft);
@@ -778,7 +1110,7 @@
         padding: 8px 14px;
         font-weight: 600;
         font-size: 0.85rem;
-        margin: 0;
+        margin: 0 2px;
         transition: var(--transition-bounce);
         min-width: 40px;
         text-align: center;
@@ -813,20 +1145,21 @@
     }
 
     @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(25px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(25px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .page-header { animation-delay: 0.05s; }
     .alert-success-premium { animation-delay: 0.1s; }
     .alert-error-premium { animation-delay: 0.1s; }
-    .table-card { animation-delay: 0.2s; }
+
+    /* Stat cards staggered */
+    .row.g-4 .col-md-4:nth-child(1) .stat-card { animation-delay: 0.1s; }
+    .row.g-4 .col-md-4:nth-child(2) .stat-card { animation-delay: 0.18s; }
+    .row.g-4 .col-md-4:nth-child(3) .stat-card { animation-delay: 0.26s; }
+
+    .filter-card { animation-delay: 0.34s; }
+    .table-card { animation-delay: 0.42s; }
 
     /* Staggered row animation */
     .bill-row {
@@ -834,33 +1167,26 @@
         animation: fadeInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
 
-    .bill-row:nth-child(1) { animation-delay: 0.25s; }
-    .bill-row:nth-child(2) { animation-delay: 0.30s; }
-    .bill-row:nth-child(3) { animation-delay: 0.35s; }
-    .bill-row:nth-child(4) { animation-delay: 0.40s; }
-    .bill-row:nth-child(5) { animation-delay: 0.45s; }
-    .bill-row:nth-child(6) { animation-delay: 0.50s; }
-    .bill-row:nth-child(7) { animation-delay: 0.55s; }
-    .bill-row:nth-child(8) { animation-delay: 0.60s; }
-    .bill-row:nth-child(9) { animation-delay: 0.65s; }
-    .bill-row:nth-child(10) { animation-delay: 0.70s; }
+    .bill-row:nth-child(1) { animation-delay: 0.48s; }
+    .bill-row:nth-child(2) { animation-delay: 0.53s; }
+    .bill-row:nth-child(3) { animation-delay: 0.58s; }
+    .bill-row:nth-child(4) { animation-delay: 0.63s; }
+    .bill-row:nth-child(5) { animation-delay: 0.68s; }
+    .bill-row:nth-child(6) { animation-delay: 0.73s; }
+    .bill-row:nth-child(7) { animation-delay: 0.78s; }
+    .bill-row:nth-child(8) { animation-delay: 0.83s; }
 
     /* --- RESPONSIVE --- */
     @media (max-width: 992px) {
-        .table-section-header {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .search-wrapper {
-            max-width: 100%;
-            width: 100%;
-        }
+        .table-section-header { flex-direction: column; align-items: flex-start; }
+        .search-wrapper { max-width: 100%; width: 100%; }
     }
 
     @media (max-width: 768px) {
         .page-title { font-size: 1.4rem; }
         .page-header { flex-direction: column; align-items: flex-start !important; gap: 16px; }
         .btn-primary-gradient { width: 100%; justify-content: center; }
+        .stat-value { font-size: 1.4rem !important; }
         .premium-table thead th,
         .premium-table tbody td { padding: 14px 12px; }
         .premium-table thead th:first-child,
@@ -871,10 +1197,10 @@
     }
 </style>
 
-<!-- Table Interaction Script -->
+<!-- Number Count-Up Animation Script -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Auto-dismiss success/error alerts after 5 seconds
+        // Auto-dismiss alerts
         document.querySelectorAll('.alert-success-premium, .alert-error-premium').forEach(alert => {
             setTimeout(() => {
                 alert.style.transition = 'all 0.5s ease';
@@ -884,30 +1210,35 @@
             }, 5000);
         });
 
-        // Live search functionality
-        const searchInput = document.getElementById('billSearch');
-        const table = document.getElementById('billTable');
-        
-        if (searchInput && table) {
-            searchInput.addEventListener('input', function(e) {
-                const searchTerm = e.target.value.toLowerCase().trim();
-                const rows = table.querySelectorAll('.bill-row');
-                
-                rows.forEach(row => {
-                    const text = row.textContent.toLowerCase();
-                    const isMatch = text.includes(searchTerm);
-                    
-                    if (isMatch) {
-                        row.style.display = '';
-                        row.style.animation = 'none';
-                        row.offsetHeight;
-                        row.style.animation = 'fadeInUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
+        // Animate stat values counting up
+        document.querySelectorAll('.stat-value[data-count]').forEach(function(el) {
+            const target = parseInt(el.getAttribute('data-count')) || 0;
+            if (target === 0) return;
+            
+            let current = 0;
+            const duration = 1200;
+            const stepTime = 16;
+            const increment = target / (duration / stepTime);
+            
+            const timer = setInterval(function() {
+                current += increment;
+                if (current >= target) {
+                    el.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    el.textContent = Math.floor(current);
+                }
+            }, stepTime);
+        });
+
+        // Animate progress bars
+        setTimeout(function() {
+            document.querySelectorAll('.stat-progress-bar').forEach(function(bar) {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(function() { bar.style.width = width; }, 100);
             });
-        }
+        }, 300);
 
         // Delete confirmation
         document.querySelectorAll('.btn-delete').forEach(btn => {

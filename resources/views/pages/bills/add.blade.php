@@ -81,13 +81,13 @@
                     <!-- Customer -->
                     <div class="col-md-4">
                         <label class="form-label-premium">
-                            Customer <span class="required-star">*</span>
+                            Customer
                         </label>
                         <div class="input-group-premium">
                             <span class="input-icon">
                                 <i class="ph ph-user"></i>
                             </span>
-                            <select name="customer_id" class="form-select-premium" required>
+                            <select name="customer_id" class="form-select-premium">
                                 <option value="">-- Select Customer --</option>
                                 @foreach($customers as $customer)
                                     <option value="{{ $customer->id }}" {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
